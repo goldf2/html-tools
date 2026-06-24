@@ -1,0 +1,1414 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Markdown 文档 HTML 渲染工具</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --text: #1f2937;
+      --muted: #667085;
+      --line: #d9dee8;
+      --soft: #fbfcfe;
+      --green: #16a34a;
+      --blue: #2563eb;
+      --red: #dc2626;
+      --code: #f3f5f8;
+      --editor: #ffffff;
+      --preview-bg: #ffffff;
+      --blockquote-bg: #ecfdf5;
+      --blockquote-text: #166534;
+      --button-primary-bg: #ecfdf5;
+      --button-primary-text: #166534;
+      --button-primary-line: #16a34a;
+      --button-secondary-bg: #eff6ff;
+      --button-secondary-text: #1d4ed8;
+      --button-secondary-line: #bfdbfe;
+      --toolbar-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+      --shell-bg: linear-gradient(180deg, #f4f8f7 0%, #edf5f3 100%);
+      --shell-glow-a: rgba(15, 118, 110, 0.12);
+      --shell-glow-b: rgba(37, 99, 235, 0.08);
+      --page-bg: rgba(255, 255, 255, 0.92);
+      --page-border: rgba(215, 226, 224, 0.9);
+      --page-shadow: 0 28px 80px rgba(15, 23, 42, 0.10);
+      --page-radius: 28px;
+      --headline-bar: linear-gradient(90deg, #0f766e, #2563eb);
+      --table-head-bg: #eef7f5;
+      --table-head-text: #5f6f77;
+      --table-stripe: #f8fcfb;
+      --link-color: #0f766e;
+      --rule-color: #d7e2e0;
+      --blockquote-border: #0f766e;
+      --code-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      letter-spacing: 0;
+    }
+
+    header {
+      padding: 24px 28px 16px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    a {
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .actions,
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .actions {
+      margin-top: 14px;
+    }
+
+    .link-button,
+    button,
+    .file-button,
+    .theme-select {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 34px;
+      padding: 7px 11px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--soft);
+      color: var(--text);
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .toolbar-group {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    button.primary {
+      border-color: var(--button-primary-line);
+      background: var(--button-primary-bg);
+      color: var(--button-primary-text);
+    }
+
+    button.secondary {
+      border-color: var(--button-secondary-line);
+      background: var(--button-secondary-bg);
+      color: var(--button-secondary-text);
+    }
+
+    button.danger {
+      border-color: #fecaca;
+      background: #fef2f2;
+      color: var(--red);
+    }
+
+    input[type="file"] {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    main {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 18px 28px 32px;
+    }
+
+    .toolbar {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--panel), var(--soft));
+      box-shadow: var(--toolbar-shadow);
+    }
+
+    .theme-select {
+      appearance: none;
+      background: var(--soft);
+      min-width: 148px;
+      font-size: 13px;
+    }
+
+    .theme-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .status {
+      margin-left: auto;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(360px, 0.92fr) minmax(420px, 1.08fr);
+      gap: 16px;
+      margin-top: 14px;
+      min-height: calc(100vh - 178px);
+    }
+
+    .panel {
+      min-width: 0;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      background: var(--soft);
+    }
+
+    textarea {
+      display: block;
+      width: 100%;
+      min-height: calc(100vh - 240px);
+      padding: 16px;
+      border: 0;
+      outline: 0;
+      resize: vertical;
+      font: 13px/1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: var(--text);
+      background: var(--editor);
+    }
+
+    .preview {
+      min-height: calc(100vh - 240px);
+      padding: 0;
+      overflow: auto;
+      background: var(--bg);
+    }
+
+    .doc-shell {
+      position: relative;
+      min-height: calc(100vh - 240px);
+      padding: 28px;
+      background: var(--shell-bg);
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .doc-shell::before,
+    .doc-shell::after {
+      content: "";
+      position: absolute;
+      inset: auto;
+      border-radius: 999px;
+      filter: blur(18px);
+      opacity: 0.9;
+      z-index: -1;
+    }
+
+    .doc-shell::before {
+      top: 22px;
+      left: 18px;
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle, var(--shell-glow-a) 0%, transparent 68%);
+    }
+
+    .doc-shell::after {
+      right: 36px;
+      bottom: 16px;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, var(--shell-glow-b) 0%, transparent 70%);
+    }
+
+    .doc-page {
+      position: relative;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 42px 48px 54px;
+      border: 1px solid var(--page-border);
+      border-radius: var(--page-radius);
+      background: var(--page-bg);
+      box-shadow: var(--page-shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .doc-content > :first-child {
+      margin-top: 0;
+    }
+
+    .doc-content > :last-child {
+      margin-bottom: 0;
+    }
+
+    .doc-content h1,
+    .doc-content h2,
+    .doc-content h3 {
+      margin: 1.2em 0 0.55em;
+      line-height: 1.28;
+    }
+
+    .doc-content h1 {
+      position: relative;
+      font-size: 34px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--rule-color);
+    }
+
+    .doc-content h1::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -1px;
+      width: 120px;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--headline-bar);
+    }
+
+    .doc-content h2 {
+      font-size: 21px;
+    }
+
+    .doc-content h3 {
+      font-size: 17px;
+    }
+
+    .doc-content p,
+    .doc-content li,
+    .doc-content td,
+    .doc-content th {
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .doc-content p {
+      margin: 0.65em 0;
+    }
+
+    .doc-content a {
+      color: var(--link-color);
+    }
+
+    .doc-content hr {
+      margin: 24px 0;
+      border: 0;
+      border-top: 1px solid var(--rule-color);
+    }
+
+    .doc-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 13px;
+      overflow: hidden;
+      border-radius: 14px;
+    }
+
+    .doc-content th,
+    .doc-content td {
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .doc-content th {
+      background: var(--table-head-bg);
+      color: var(--table-head-text);
+      font-weight: 600;
+    }
+
+    .doc-content tbody tr:nth-child(even) td {
+      background: var(--table-stripe);
+    }
+
+    .doc-content blockquote {
+      margin: 14px 0;
+      padding: 9px 12px;
+      border-left: 4px solid var(--blockquote-border);
+      background: var(--blockquote-bg);
+      color: var(--blockquote-text);
+      border-radius: 0 14px 14px 0;
+    }
+
+    .doc-content pre {
+      overflow: auto;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--code);
+      box-shadow: var(--code-shadow);
+    }
+
+    .doc-content code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.92em;
+    }
+
+    .doc-content :not(pre) > code {
+      padding: 2px 5px;
+      border-radius: 5px;
+      background: var(--code);
+    }
+
+    .doc-content .mermaid {
+      margin: 16px 0;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--preview-bg);
+      box-shadow: var(--code-shadow);
+    }
+
+    .notice {
+      display: none;
+      margin-top: 10px;
+      padding: 9px 11px;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      background: #fef2f2;
+      color: var(--red);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .notice.show {
+      display: block;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .meta-panel {
+      min-width: 0;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .meta-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      background: var(--soft);
+    }
+
+    .meta-actions {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mini-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      padding: 5px 9px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .toggle-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    .toggle-inline input {
+      margin: 0;
+    }
+
+    .meta-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .meta-body {
+      max-height: 220px;
+      overflow: auto;
+      padding: 10px 12px 14px;
+    }
+
+    .meta-empty {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      padding: 6px 0;
+    }
+
+    .file-list,
+    .result-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .file-item,
+    .result-item {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--soft);
+    }
+
+    .file-index,
+    .result-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 26px;
+      min-height: 26px;
+      padding: 0 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .result-badge.ok {
+      background: #ecfdf5;
+      border-color: #86efac;
+      color: #166534;
+    }
+
+    .result-badge.download {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+      color: #1d4ed8;
+    }
+
+    .result-badge.fail {
+      background: #fef2f2;
+      border-color: #fecaca;
+      color: #b91c1c;
+    }
+
+    .file-name,
+    .result-name {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text);
+      word-break: break-all;
+    }
+
+    .file-desc,
+    .result-desc {
+      margin-top: 2px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--muted);
+      word-break: break-all;
+    }
+
+    @media (max-width: 980px) {
+      header,
+      main {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .meta-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .status {
+        width: 100%;
+        margin-left: 0;
+      }
+
+      .doc-shell {
+        padding: 16px;
+      }
+
+      .doc-page {
+        padding: 28px 20px 34px;
+        border-radius: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Markdown 文档 HTML 渲染工具</h1>
+    <p class="subtitle">标准接口: Markdown 输入、HTML 预览、Mermaid 渲染、独立 HTML 导出。需要写回原目录时，先打开 MD 文件，再绑定其所在目录。</p>
+    <div class="actions">
+      <a class="link-button" href="../../index.html">返回工具首页</a>
+      <span class="theme-note">Coolify 静态部署版</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <div class="toolbar-group">
+        <button id="openFileButton" type="button">打开 MD 文件</button>
+        <button id="bindDirectoryButton" type="button">绑定输出目录</button>
+        <button id="openFolderButton" type="button">选择目录中的 MD</button>
+        <button id="openMultipleButton" type="button">选择多个 MD</button>
+        <label class="file-button" for="fileInput">选择 MD 文件</label>
+        <input id="fileInput" type="file" accept=".md,.markdown,text/markdown,text/plain" multiple>
+      </div>
+      <select class="theme-select" id="themeSelect" aria-label="选择色彩主题">
+        <option value="mist">雾青</option>
+        <option value="spruce">云杉</option>
+        <option value="amber">琥珀</option>
+        <option value="graphite">石墨</option>
+      </select>
+      <button class="primary" id="renderButton" type="button">渲染预览</button>
+      <button class="secondary" id="exportButton" type="button">导出 HTML</button>
+      <button class="secondary" id="exportMultipleButton" type="button">批量导出 HTML</button>
+      <button class="danger" id="clearButton" type="button">清空</button>
+      <span class="status" id="statusText">未加载文件</span>
+    </div>
+
+    <div class="notice" id="notice"></div>
+
+    <section class="meta-grid">
+      <div class="meta-panel">
+        <div class="meta-head">
+          <div class="meta-title">已选文件</div>
+        </div>
+        <div class="meta-body" id="selectedFilesPanel">
+          <div class="meta-empty">当前还没有选择 Markdown 文件。</div>
+        </div>
+      </div>
+      <div class="meta-panel">
+        <div class="meta-head">
+          <div class="meta-title">导出结果</div>
+          <div class="meta-actions">
+            <label class="toggle-inline">
+              <input id="failOnlyToggle" type="checkbox">
+              <span>只看失败项</span>
+            </label>
+            <button class="mini-button" id="clearResultsButton" type="button">清空结果</button>
+          </div>
+        </div>
+        <div class="meta-body" id="exportResultsPanel">
+          <div class="meta-empty">导出后会在这里显示成功、下载或失败的结果。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Markdown</h2>
+        </div>
+        <textarea id="markdownInput" spellcheck="false"># web2py 文档渲染样例
+
+| 阶段 | 口径 |
+| --- | --- |
+| S0 | 现状保护与盘点 |
+| S5 | Docker 化 |
+
+```mermaid
+flowchart LR
+    A["Markdown"] --> B["HTML 预览"]
+    B --> C["独立 HTML"]
+```
+</textarea>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>HTML 预览</h2>
+        </div>
+        <article class="preview" id="preview"></article>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    const input = document.getElementById('markdownInput');
+    const preview = document.getElementById('preview');
+    const fileInput = document.getElementById('fileInput');
+    const openFileButton = document.getElementById('openFileButton');
+    const bindDirectoryButton = document.getElementById('bindDirectoryButton');
+    const openFolderButton = document.getElementById('openFolderButton');
+    const openMultipleButton = document.getElementById('openMultipleButton');
+    const exportMultipleButton = document.getElementById('exportMultipleButton');
+    const themeSelect = document.getElementById('themeSelect');
+    const statusText = document.getElementById('statusText');
+    const notice = document.getElementById('notice');
+    const selectedFilesPanel = document.getElementById('selectedFilesPanel');
+    const exportResultsPanel = document.getElementById('exportResultsPanel');
+    const failOnlyToggle = document.getElementById('failOnlyToggle');
+    const clearResultsButton = document.getElementById('clearResultsButton');
+    let sourceFileHandle = null;
+    let sourceFileName = '';
+    let outputDirectoryHandle = null;
+    let batchFiles = [];
+    let lastExportResults = [];
+    let showFailuresOnly = false;
+    const THEMES = {
+      mist: {
+        label: '雾青',
+        vars: {
+          bg: '#f4f8f7',
+          panel: '#ffffff',
+          text: '#1f2937',
+          muted: '#5f6f77',
+          line: '#d7e2e0',
+          soft: '#eef7f5',
+          green: '#0f766e',
+          blue: '#2563eb',
+          red: '#dc2626',
+          code: '#edf6f4',
+          editor: '#fcfefe',
+          previewBg: '#ffffff',
+          blockquoteBg: '#def7f3',
+          blockquoteText: '#115e59',
+          buttonPrimaryBg: '#def7f3',
+          buttonPrimaryText: '#115e59',
+          buttonPrimaryLine: '#0f766e',
+          buttonSecondaryBg: '#eff6ff',
+          buttonSecondaryText: '#1d4ed8',
+          buttonSecondaryLine: '#bfdbfe',
+          toolbarShadow: '0 10px 30px rgba(15, 118, 110, 0.10)',
+          shellBg: 'linear-gradient(180deg, #f4f8f7 0%, #edf5f3 100%)',
+          shellGlowA: 'rgba(15, 118, 110, 0.12)',
+          shellGlowB: 'rgba(37, 99, 235, 0.08)',
+          pageBg: 'rgba(255, 255, 255, 0.92)',
+          pageBorder: 'rgba(215, 226, 224, 0.9)',
+          pageShadow: '0 28px 80px rgba(15, 23, 42, 0.10)',
+          pageRadius: '28px',
+          headlineBar: 'linear-gradient(90deg, #0f766e, #2563eb)',
+          tableHeadBg: '#eef7f5',
+          tableHeadText: '#5f6f77',
+          tableStripe: '#f8fcfb',
+          linkColor: '#0f766e',
+          ruleColor: '#d7e2e0',
+          blockquoteBorder: '#0f766e',
+          codeShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.7)'
+        }
+      },
+      spruce: {
+        label: '云杉',
+        vars: {
+          bg: '#f5f7f2',
+          panel: '#fffefa',
+          text: '#243127',
+          muted: '#68766a',
+          line: '#dbe4d8',
+          soft: '#f1f6ef',
+          green: '#3f6212',
+          blue: '#1d4ed8',
+          red: '#b91c1c',
+          code: '#f2f5ee',
+          editor: '#fffefa',
+          previewBg: '#fffefa',
+          blockquoteBg: '#eef8da',
+          blockquoteText: '#3f6212',
+          buttonPrimaryBg: '#eef8da',
+          buttonPrimaryText: '#3f6212',
+          buttonPrimaryLine: '#65a30d',
+          buttonSecondaryBg: '#eef2ff',
+          buttonSecondaryText: '#3730a3',
+          buttonSecondaryLine: '#c7d2fe',
+          toolbarShadow: '0 10px 30px rgba(63, 98, 18, 0.08)',
+          shellBg: 'linear-gradient(180deg, #f4f7ef 0%, #edf2e8 100%)',
+          shellGlowA: 'rgba(101, 163, 13, 0.11)',
+          shellGlowB: 'rgba(55, 48, 163, 0.07)',
+          pageBg: 'rgba(255, 254, 250, 0.95)',
+          pageBorder: 'rgba(219, 228, 216, 0.9)',
+          pageShadow: '0 26px 74px rgba(63, 98, 18, 0.10)',
+          pageRadius: '28px',
+          headlineBar: 'linear-gradient(90deg, #65a30d, #3730a3)',
+          tableHeadBg: '#f1f6ef',
+          tableHeadText: '#68766a',
+          tableStripe: '#fbfdf9',
+          linkColor: '#3f6212',
+          ruleColor: '#dbe4d8',
+          blockquoteBorder: '#65a30d',
+          codeShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.72)'
+        }
+      },
+      amber: {
+        label: '琥珀',
+        vars: {
+          bg: '#fcf7ef',
+          panel: '#fffdfa',
+          text: '#31261c',
+          muted: '#7b6957',
+          line: '#eadcc8',
+          soft: '#fbf2e5',
+          green: '#b45309',
+          blue: '#0f766e',
+          red: '#c2410c',
+          code: '#f8efe1',
+          editor: '#fffdf9',
+          previewBg: '#fffdfa',
+          blockquoteBg: '#ffedd5',
+          blockquoteText: '#9a3412',
+          buttonPrimaryBg: '#ffedd5',
+          buttonPrimaryText: '#9a3412',
+          buttonPrimaryLine: '#d97706',
+          buttonSecondaryBg: '#dcfce7',
+          buttonSecondaryText: '#166534',
+          buttonSecondaryLine: '#86efac',
+          toolbarShadow: '0 10px 30px rgba(180, 83, 9, 0.10)',
+          shellBg: 'linear-gradient(180deg, #fdf7ef 0%, #f9efdf 100%)',
+          shellGlowA: 'rgba(217, 119, 6, 0.12)',
+          shellGlowB: 'rgba(22, 101, 52, 0.07)',
+          pageBg: 'rgba(255, 253, 250, 0.94)',
+          pageBorder: 'rgba(234, 220, 200, 0.9)',
+          pageShadow: '0 30px 86px rgba(146, 64, 14, 0.12)',
+          pageRadius: '30px',
+          headlineBar: 'linear-gradient(90deg, #d97706, #166534)',
+          tableHeadBg: '#fbf2e5',
+          tableHeadText: '#7b6957',
+          tableStripe: '#fffaf2',
+          linkColor: '#b45309',
+          ruleColor: '#eadcc8',
+          blockquoteBorder: '#d97706',
+          codeShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.7)'
+        }
+      },
+      graphite: {
+        label: '石墨',
+        vars: {
+          bg: '#111827',
+          panel: '#172033',
+          text: '#e5eef9',
+          muted: '#a8b4c7',
+          line: '#314055',
+          soft: '#1d293d',
+          green: '#38bdf8',
+          blue: '#60a5fa',
+          red: '#f87171',
+          code: '#0f172a',
+          editor: '#0f172a',
+          previewBg: '#111827',
+          blockquoteBg: '#082f49',
+          blockquoteText: '#bae6fd',
+          buttonPrimaryBg: '#082f49',
+          buttonPrimaryText: '#bae6fd',
+          buttonPrimaryLine: '#38bdf8',
+          buttonSecondaryBg: '#1e293b',
+          buttonSecondaryText: '#cbd5e1',
+          buttonSecondaryLine: '#475569',
+          toolbarShadow: '0 14px 34px rgba(2, 6, 23, 0.36)',
+          shellBg: 'radial-gradient(circle at top left, #1e293b 0%, #111827 56%, #0b1220 100%)',
+          shellGlowA: 'rgba(56, 189, 248, 0.16)',
+          shellGlowB: 'rgba(96, 165, 250, 0.12)',
+          pageBg: 'rgba(15, 23, 42, 0.84)',
+          pageBorder: 'rgba(71, 85, 105, 0.9)',
+          pageShadow: '0 30px 96px rgba(2, 6, 23, 0.50)',
+          pageRadius: '30px',
+          headlineBar: 'linear-gradient(90deg, #38bdf8, #60a5fa)',
+          tableHeadBg: '#1d293d',
+          tableHeadText: '#a8b4c7',
+          tableStripe: '#152033',
+          linkColor: '#7dd3fc',
+          ruleColor: '#314055',
+          blockquoteBorder: '#38bdf8',
+          codeShadow: 'inset 0 1px 0 rgba(148, 163, 184, 0.10)'
+        }
+      }
+    };
+
+    let activeTheme = themeSelect.value;
+
+    marked.setOptions({
+      gfm: true,
+      breaks: false,
+      mangle: false,
+      headerIds: true
+    });
+
+    function getThemeConfig(themeKey = activeTheme) {
+      return THEMES[themeKey] || THEMES.mist;
+    }
+
+    function getMermaidThemeVariables(themeKey = activeTheme) {
+      const vars = getThemeConfig(themeKey).vars;
+      return {
+        primaryColor: vars.soft,
+        primaryBorderColor: vars.green,
+        primaryTextColor: vars.text,
+        lineColor: vars.muted,
+        secondaryColor: vars.blockquoteBg,
+        tertiaryColor: vars.previewBg,
+        background: vars.previewBg,
+        mainBkg: vars.soft,
+        fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif'
+      };
+    }
+
+    function configureMermaid(themeKey = activeTheme) {
+      mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: 'loose',
+        theme: 'base',
+        themeVariables: getMermaidThemeVariables(themeKey)
+      });
+    }
+
+    function applyTheme(themeKey = activeTheme) {
+      const vars = getThemeConfig(themeKey).vars;
+      const root = document.documentElement;
+      root.style.setProperty('--bg', vars.bg);
+      root.style.setProperty('--panel', vars.panel);
+      root.style.setProperty('--text', vars.text);
+      root.style.setProperty('--muted', vars.muted);
+      root.style.setProperty('--line', vars.line);
+      root.style.setProperty('--soft', vars.soft);
+      root.style.setProperty('--green', vars.green);
+      root.style.setProperty('--blue', vars.blue);
+      root.style.setProperty('--red', vars.red);
+      root.style.setProperty('--code', vars.code);
+      root.style.setProperty('--editor', vars.editor);
+      root.style.setProperty('--preview-bg', vars.previewBg);
+      root.style.setProperty('--blockquote-bg', vars.blockquoteBg);
+      root.style.setProperty('--blockquote-text', vars.blockquoteText);
+      root.style.setProperty('--button-primary-bg', vars.buttonPrimaryBg);
+      root.style.setProperty('--button-primary-text', vars.buttonPrimaryText);
+      root.style.setProperty('--button-primary-line', vars.buttonPrimaryLine);
+      root.style.setProperty('--button-secondary-bg', vars.buttonSecondaryBg);
+      root.style.setProperty('--button-secondary-text', vars.buttonSecondaryText);
+      root.style.setProperty('--button-secondary-line', vars.buttonSecondaryLine);
+      root.style.setProperty('--toolbar-shadow', vars.toolbarShadow);
+      root.style.setProperty('--shell-bg', vars.shellBg);
+      root.style.setProperty('--shell-glow-a', vars.shellGlowA);
+      root.style.setProperty('--shell-glow-b', vars.shellGlowB);
+      root.style.setProperty('--page-bg', vars.pageBg);
+      root.style.setProperty('--page-border', vars.pageBorder);
+      root.style.setProperty('--page-shadow', vars.pageShadow);
+      root.style.setProperty('--page-radius', vars.pageRadius);
+      root.style.setProperty('--headline-bar', vars.headlineBar);
+      root.style.setProperty('--table-head-bg', vars.tableHeadBg);
+      root.style.setProperty('--table-head-text', vars.tableHeadText);
+      root.style.setProperty('--table-stripe', vars.tableStripe);
+      root.style.setProperty('--link-color', vars.linkColor);
+      root.style.setProperty('--rule-color', vars.ruleColor);
+      root.style.setProperty('--blockquote-border', vars.blockquoteBorder);
+      root.style.setProperty('--code-shadow', vars.codeShadow);
+      activeTheme = themeKey;
+      configureMermaid(themeKey);
+    }
+
+    function getExportStyle(themeKey = activeTheme) {
+      const vars = getThemeConfig(themeKey).vars;
+      return `
+      *{box-sizing:border-box}
+      body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:${vars.text};background:${vars.bg};letter-spacing:0}
+      .doc-shell{position:relative;min-height:100vh;padding:28px;background:${vars.shellBg};overflow:hidden;isolation:isolate}
+      .doc-shell::before,.doc-shell::after{content:"";position:absolute;border-radius:999px;filter:blur(18px);opacity:.9;z-index:-1}
+      .doc-shell::before{top:22px;left:18px;width:240px;height:240px;background:radial-gradient(circle, ${vars.shellGlowA} 0%, transparent 68%)}
+      .doc-shell::after{right:36px;bottom:16px;width:300px;height:300px;background:radial-gradient(circle, ${vars.shellGlowB} 0%, transparent 70%)}
+      .doc-page{position:relative;max-width:1120px;margin:0 auto;padding:42px 48px 54px;border:1px solid ${vars.pageBorder};border-radius:${vars.pageRadius};background:${vars.pageBg};box-shadow:${vars.pageShadow};backdrop-filter:blur(10px)}
+      .doc-content>:first-child{margin-top:0}.doc-content>:last-child{margin-bottom:0}
+      h1,h2,h3{margin:1.2em 0 .55em;line-height:1.28}
+      h1{position:relative;font-size:34px;padding-bottom:18px;border-bottom:1px solid ${vars.ruleColor}}
+      h1::after{content:"";position:absolute;left:0;bottom:-1px;width:120px;height:4px;border-radius:999px;background:${vars.headlineBar}}
+      h2{font-size:21px} h3{font-size:17px}
+      p,li,td,th{font-size:14px;line-height:1.75}
+      a{color:${vars.linkColor}}
+      hr{margin:24px 0;border:0;border-top:1px solid ${vars.ruleColor}}
+      table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border-radius:14px;overflow:hidden}
+      th,td{border:1px solid ${vars.line};padding:8px 10px;text-align:left;vertical-align:top}
+      th{background:${vars.tableHeadBg};color:${vars.tableHeadText};font-weight:600}
+      tbody tr:nth-child(even) td{background:${vars.tableStripe}}
+      blockquote{margin:14px 0;padding:9px 12px;border-left:4px solid ${vars.blockquoteBorder};background:${vars.blockquoteBg};color:${vars.blockquoteText};border-radius:0 14px 14px 0}
+      pre{overflow:auto;padding:12px;border:1px solid ${vars.line};border-radius:14px;background:${vars.code};box-shadow:${vars.codeShadow}}
+      code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em}
+      :not(pre)>code{padding:2px 5px;border-radius:5px;background:${vars.code}}
+      .mermaid{margin:16px 0;padding:16px;border:1px solid ${vars.line};border-radius:16px;background:${vars.previewBg};box-shadow:${vars.codeShadow}}
+      @media (max-width:980px){.doc-shell{padding:16px}.doc-page{padding:28px 20px 34px;border-radius:20px}}
+      `;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function showNotice(message) {
+      notice.textContent = message || '';
+      notice.classList.toggle('show', Boolean(message));
+    }
+
+    function getBaseName(filename) {
+      return (filename || 'markdown-document').replace(/\.[^.]+$/, '');
+    }
+
+    function getExportFileName() {
+      const title = document.querySelector('#preview h1')?.textContent || 'Markdown 文档';
+      const preferred = sourceFileName ? getBaseName(sourceFileName) : title;
+      return (preferred || 'markdown-document').replace(/[\\/:*?"<>|]+/g, '-').trim() + '.html';
+    }
+
+    function renderSelectedFiles() {
+      if (!batchFiles.length) {
+        selectedFilesPanel.innerHTML = '<div class="meta-empty">当前还没有选择 Markdown 文件。</div>';
+        return;
+      }
+      selectedFilesPanel.innerHTML = '<div class="file-list">' + batchFiles.map((file, index) => {
+        const size = typeof file.size === 'number' ? Math.max(1, Math.round(file.size / 1024)) + ' KB' : '-';
+        return `
+          <div class="file-item">
+            <div class="file-index">${index + 1}</div>
+            <div>
+              <div class="file-name">${escapeHtml(file.name)}</div>
+              <div class="file-desc">${size}</div>
+            </div>
+          </div>
+        `;
+      }).join('') + '</div>';
+    }
+
+    function renderExportResults() {
+      const visibleResults = showFailuresOnly
+        ? lastExportResults.filter((item) => item.type === 'fail')
+        : lastExportResults;
+      if (!visibleResults.length) {
+        const message = lastExportResults.length && showFailuresOnly
+          ? '当前没有失败项。'
+          : '导出后会在这里显示成功、下载或失败的结果。';
+        exportResultsPanel.innerHTML = '<div class="meta-empty">' + message + '</div>';
+        return;
+      }
+      if (!lastExportResults.length) {
+        exportResultsPanel.innerHTML = '<div class="meta-empty">导出后会在这里显示成功、下载或失败的结果。</div>';
+        return;
+      }
+      exportResultsPanel.innerHTML = '<div class="result-list">' + visibleResults.map((item) => {
+        const badgeClass = item.type === 'ok' ? 'ok' : item.type === 'download' ? 'download' : 'fail';
+        const badgeText = item.type === 'ok' ? '写入' : item.type === 'download' ? '下载' : '失败';
+        return `
+          <div class="result-item">
+            <div class="result-badge ${badgeClass}">${badgeText}</div>
+            <div>
+              <div class="result-name">${escapeHtml(item.name)}</div>
+              <div class="result-desc">${escapeHtml(item.message || '')}</div>
+            </div>
+          </div>
+        `;
+      }).join('') + '</div>';
+    }
+
+    function setBatchFiles(files, noticeText) {
+      batchFiles = files || [];
+      renderSelectedFiles();
+      if (batchFiles.length) {
+        sourceFileName = batchFiles[0].name;
+      }
+      if (noticeText) {
+        showNotice(noticeText);
+      }
+    }
+
+    function setStatus(prefix) {
+      const theme = getThemeConfig(activeTheme).label;
+      const batch = batchFiles.length > 1 ? '批量 ' + batchFiles.length + ' 个文件' : null;
+      const source = outputDirectoryHandle
+        ? '原目录/指定目录直写可用'
+        : sourceFileName
+          ? '仅下载导出'
+          : '未绑定原文件';
+      const parts = [prefix, theme];
+      if (batch) parts.push(batch);
+      parts.push(source);
+      statusText.textContent = parts.join(' · ');
+    }
+
+    function buildHtml(markdown) {
+      const raw = marked.parse(markdown || '');
+      const clean = DOMPurify.sanitize(raw, {
+        ADD_TAGS: ['iframe'],
+        ADD_ATTR: ['target', 'class', 'id']
+      });
+      const container = document.createElement('div');
+      container.innerHTML = clean;
+      container.querySelectorAll('pre > code.language-mermaid, pre > code.lang-mermaid').forEach((code) => {
+        const block = document.createElement('div');
+        block.className = 'mermaid';
+        block.textContent = code.textContent;
+        code.parentElement.replaceWith(block);
+      });
+      return container.innerHTML;
+    }
+
+    function buildExportDocument(markdown, titleText) {
+      const body = buildHtml(markdown);
+      const title = titleText || 'Markdown 文档';
+      return `<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${escapeHtml(title)}</title>
+  <style>${getExportStyle(activeTheme)}</style>
+</head>
+<body>
+  <main class="doc-shell"><section class="doc-page"><article class="doc-content">${body}</article></section></main>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"><\/script>
+  <script>
+    mermaid.initialize({
+      startOnLoad:true,
+      securityLevel:'loose',
+      theme:'base',
+      themeVariables:${JSON.stringify(getMermaidThemeVariables(activeTheme))}
+    });
+  <\/script>
+</body>
+</html>`;
+    }
+
+    async function renderMarkdown() {
+      showNotice('');
+      preview.innerHTML = `<div class="doc-shell"><div class="doc-page"><div class="doc-content">${buildHtml(input.value)}</div></div></div>`;
+      try {
+        configureMermaid(activeTheme);
+        await mermaid.run({ nodes: preview.querySelectorAll('.mermaid') });
+        setStatus('预览已更新');
+      } catch (error) {
+        showNotice('Mermaid 渲染失败: ' + error.message);
+        setStatus('预览已更新，Mermaid 存在错误');
+      }
+    }
+
+    async function writeHtmlToSourceDirectory(html, filename) {
+      if (!outputDirectoryHandle) return false;
+      const targetName = filename || getExportFileName();
+      const targetHandle = await outputDirectoryHandle.getFileHandle(targetName, { create: true });
+      const writable = await targetHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      return true;
+    }
+
+    function downloadHtml(html, filename) {
+      const link = document.createElement('a');
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(link.href);
+    }
+
+    async function exportHtml() {
+      const title = document.querySelector('#preview h1')?.textContent || 'Markdown 文档';
+      const html = buildExportDocument(input.value, title);
+      const exportName = getExportFileName();
+      lastExportResults = [];
+      try {
+        const wrote = await writeHtmlToSourceDirectory(html, exportName);
+        if (wrote) {
+          lastExportResults = [{ type: 'ok', name: exportName, message: '已写入绑定目录。' }];
+          renderExportResults();
+          showNotice('');
+          setStatus('HTML 已写入原目录');
+          return;
+        }
+      } catch (error) {
+        lastExportResults = [{ type: 'fail', name: exportName, message: error.message }];
+        renderExportResults();
+        showNotice('无法直接写入原目录，已切换为下载导出: ' + error.message);
+      }
+      downloadHtml(html, exportName);
+      lastExportResults = [{ type: 'download', name: exportName, message: '已通过浏览器下载导出。' }];
+      renderExportResults();
+      setStatus('HTML 已下载导出');
+    }
+
+    async function exportMultipleFiles() {
+      if (!batchFiles.length) {
+        showNotice('请先选择多个 Markdown 文件。');
+        return;
+      }
+      let written = 0;
+      let downloaded = 0;
+      const failures = [];
+      lastExportResults = [];
+      for (const file of batchFiles) {
+        try {
+          const markdown = await file.text();
+          const exportName = getBaseName(file.name).replace(/[\\/:*?"<>|]+/g, '-').trim() + '.html';
+          const html = buildExportDocument(markdown, getBaseName(file.name));
+          if (outputDirectoryHandle) {
+            await writeHtmlToSourceDirectory(html, exportName);
+            written += 1;
+            lastExportResults.push({ type: 'ok', name: exportName, message: '已写入绑定目录。' });
+          } else {
+            downloadHtml(html, exportName);
+            downloaded += 1;
+            lastExportResults.push({ type: 'download', name: exportName, message: '已通过浏览器下载导出。' });
+          }
+        } catch (error) {
+          failures.push(file.name + ': ' + error.message);
+          lastExportResults.push({ type: 'fail', name: file.name, message: error.message });
+        }
+      }
+      renderExportResults();
+      if (failures.length) {
+        showNotice('部分文件导出失败: ' + failures.join('；'));
+      } else {
+        showNotice('');
+      }
+      const result = [];
+      if (written) result.push('写入 ' + written + ' 个');
+      if (downloaded) result.push('下载 ' + downloaded + ' 个');
+      if (failures.length) result.push('失败 ' + failures.length + ' 个');
+      setStatus('批量导出完成' + (result.length ? ' · ' + result.join(' / ') : ''));
+    }
+
+    async function openMarkdownFile() {
+      if (!window.showOpenFilePicker) {
+        showNotice('当前浏览器不支持文件句柄增强模式，请使用“选择 MD 文件”后下载导出。');
+        return;
+      }
+      try {
+        const [handle] = await window.showOpenFilePicker({
+          multiple: false,
+          types: [{
+            description: 'Markdown',
+            accept: { 'text/markdown': ['.md', '.markdown'], 'text/plain': ['.md'] }
+          }]
+        });
+        if (!handle) return;
+        const file = await handle.getFile();
+        input.value = await file.text();
+        sourceFileHandle = handle;
+        sourceFileName = file.name;
+        showNotice('已打开 Markdown 文件。若要把 HTML 写回同目录，请再点击“绑定输出目录”，选择该 Markdown 所在目录。');
+        await renderMarkdown();
+      } catch (error) {
+        if (error && error.name === 'AbortError') return;
+        showNotice('打开文件失败: ' + error.message);
+      }
+    }
+
+    async function bindOutputDirectory() {
+      if (!window.showDirectoryPicker) {
+        showNotice('当前浏览器不支持目录句柄，请继续使用下载导出。');
+        return;
+      }
+      try {
+        outputDirectoryHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+        showNotice('');
+        setStatus('已绑定输出目录');
+      } catch (error) {
+        if (error && error.name === 'AbortError') return;
+        showNotice('绑定输出目录失败: ' + error.message);
+      }
+    }
+
+    async function openMultipleFiles() {
+      if (!window.showOpenFilePicker) {
+        showNotice('当前浏览器不支持多文件句柄模式，请使用“选择 MD 文件”选择多个文件。');
+        return;
+      }
+      try {
+        const handles = await window.showOpenFilePicker({
+          multiple: true,
+          types: [{
+            description: 'Markdown',
+            accept: { 'text/markdown': ['.md', '.markdown'], 'text/plain': ['.md'] }
+          }]
+        });
+        if (!handles || !handles.length) return;
+        const files = await Promise.all(handles.map((handle) => handle.getFile()));
+        setBatchFiles(files, '已选择 ' + files.length + ' 个 Markdown 文件。当前预览显示第一个文件；批量导出会处理全部文件。');
+        const firstFile = batchFiles[0];
+        input.value = await firstFile.text();
+        sourceFileHandle = handles[0];
+        await renderMarkdown();
+      } catch (error) {
+        if (error && error.name === 'AbortError') return;
+        showNotice('选择多个文件失败: ' + error.message);
+      }
+    }
+
+    async function openMarkdownFolder() {
+      if (!window.showDirectoryPicker) {
+        showNotice('当前浏览器不支持目录读取，请继续使用“选择多个 MD”。');
+        return;
+      }
+      try {
+        const directoryHandle = await window.showDirectoryPicker({ mode: 'read' });
+        const files = [];
+        for await (const entry of directoryHandle.values()) {
+          if (entry.kind !== 'file') continue;
+          if (!/\.md(?:own)?$/i.test(entry.name)) continue;
+          files.push(await entry.getFile());
+        }
+        files.sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'));
+        if (!files.length) {
+          showNotice('所选目录中没有找到 .md 或 .markdown 文件。');
+          return;
+        }
+        setBatchFiles(files, '已从目录中加载 ' + files.length + ' 个 Markdown 文件。当前预览显示第一个文件；批量导出会处理全部文件。');
+        input.value = await files[0].text();
+        sourceFileHandle = null;
+        await renderMarkdown();
+      } catch (error) {
+        if (error && error.name === 'AbortError') return;
+        showNotice('读取目录失败: ' + error.message);
+      }
+    }
+
+    fileInput.addEventListener('change', () => {
+      const files = fileInput.files ? Array.from(fileInput.files) : [];
+      if (!files.length) return;
+      setBatchFiles(files, files.length > 1 ? '已选择 ' + files.length + ' 个 Markdown 文件。当前预览显示第一个文件；批量导出会处理全部文件。' : '');
+      const file = files[0];
+      const reader = new FileReader();
+      reader.onload = async () => {
+        input.value = reader.result;
+        sourceFileHandle = null;
+        if (files.length <= 1) {
+          showNotice('');
+        }
+        await renderMarkdown();
+      };
+      reader.onerror = () => showNotice('文件读取失败');
+      reader.readAsText(file, 'utf-8');
+    });
+
+    openFileButton.addEventListener('click', openMarkdownFile);
+    bindDirectoryButton.addEventListener('click', bindOutputDirectory);
+    openFolderButton.addEventListener('click', openMarkdownFolder);
+    openMultipleButton.addEventListener('click', openMultipleFiles);
+    document.getElementById('renderButton').addEventListener('click', renderMarkdown);
+    document.getElementById('exportButton').addEventListener('click', exportHtml);
+    exportMultipleButton.addEventListener('click', exportMultipleFiles);
+    failOnlyToggle.addEventListener('change', () => {
+      showFailuresOnly = failOnlyToggle.checked;
+      renderExportResults();
+    });
+    clearResultsButton.addEventListener('click', () => {
+      lastExportResults = [];
+      showFailuresOnly = false;
+      failOnlyToggle.checked = false;
+      renderExportResults();
+      setStatus('已清空导出结果');
+    });
+    themeSelect.addEventListener('change', async () => {
+      applyTheme(themeSelect.value);
+      await renderMarkdown();
+    });
+    document.getElementById('clearButton').addEventListener('click', async () => {
+      input.value = '';
+      sourceFileHandle = null;
+      sourceFileName = '';
+      outputDirectoryHandle = null;
+      batchFiles = [];
+      lastExportResults = [];
+      showFailuresOnly = false;
+      failOnlyToggle.checked = false;
+      renderSelectedFiles();
+      renderExportResults();
+      setStatus('已清空');
+      await renderMarkdown();
+    });
+
+    input.addEventListener('input', () => {
+      setStatus('内容已修改');
+    });
+
+    window.Web2pyDocRenderer = {
+      buildHtml,
+      applyTheme,
+      bindOutputDirectory,
+      exportMultipleFiles,
+      openMarkdownFolder,
+      openMarkdownFile,
+      openMultipleFiles,
+      renderMarkdown,
+      exportHtml
+    };
+
+    applyTheme(activeTheme);
+    renderSelectedFiles();
+    renderExportResults();
+    renderMarkdown();
+  </script>
+</body>
+</html>
