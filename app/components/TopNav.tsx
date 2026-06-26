@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import packageInfo from '@/package.json';
 
 type NavTool = {
   id: string;
@@ -26,23 +27,12 @@ function categoryHref(category: string) {
 export default function TopNav() {
   const pathname = usePathname() || '/';
   const [tools, setTools] = useState<NavTool[]>([]);
-  const [openCategory, setOpenCategory] = useState('');
 
   useEffect(() => {
     fetch('/api/tools', { cache: 'no-store' })
       .then((response) => response.json())
       .then((data) => setTools(Array.isArray(data.tools) ? data.tools : []))
       .catch(() => setTools([]));
-  }, []);
-
-  useEffect(() => {
-    function closeMenu(event: MouseEvent) {
-      const target = event.target as HTMLElement;
-      if (!target.closest('.site-nav__category')) setOpenCategory('');
-    }
-
-    document.addEventListener('click', closeMenu);
-    return () => document.removeEventListener('click', closeMenu);
   }, []);
 
   const categories = useMemo(() => {
@@ -63,6 +53,7 @@ export default function TopNav() {
       <div className="site-nav__inner">
         <a className="site-nav__brand" href="/">
           HTML Tools
+          <span className="site-nav__version">v{packageInfo.version}</span>
         </a>
         <div className="site-nav__menus">
           <a aria-current={pathname === '/' ? 'page' : undefined} className="site-nav__link" href="/">
@@ -72,39 +63,14 @@ export default function TopNav() {
             const categoryActive = items.some((tool) => pathname === toAbsoluteHref(tool.href));
 
             return (
-              <div className={`site-nav__category${openCategory === category ? ' is-open' : ''}`} key={category}>
-                <button
+              <a
                   aria-current={categoryActive ? 'page' : undefined}
-                  aria-expanded={openCategory === category}
-                  className="site-nav__link site-nav__category-trigger"
-                  type="button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    setOpenCategory((current) => current === category ? '' : category);
-                  }}
+                className="site-nav__link"
+                href={categoryHref(category)}
+                key={category}
                 >
                   {category}
-                </button>
-                <div className="site-nav__submenu">
-                  <a className="site-nav__submenu-link site-nav__submenu-all" href={categoryHref(category)}>
-                    查看全部
-                  </a>
-                  {items.map((tool) => {
-                    const href = toAbsoluteHref(tool.href);
-
-                    return (
-                      <a
-                        aria-current={pathname === href ? 'page' : undefined}
-                        className="site-nav__submenu-link"
-                        href={href}
-                        key={tool.id}
-                      >
-                        <span>{tool.title}</span>
-                      </a>
-                    );
-                  })}
-                </div>
-              </div>
+              </a>
             );
           })}
         </div>
