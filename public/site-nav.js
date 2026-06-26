@@ -61,6 +61,8 @@
     '.site-nav__link{display:inline-flex;min-height:32px;align-items:center;padding:6px 9px;border:0;border-radius:8px;background:transparent;color:#475467;font:inherit;font-size:13px;font-weight:700;text-decoration:none;white-space:nowrap;cursor:pointer;}',
     '.site-nav__link:hover,.site-nav__link[aria-current=page]{background:#eff6ff;color:#2563eb;}',
     '.site-nav__admin-link{border:1px solid #d9dee8;background:#fff;}',
+    '.tool-version-footer{width:min(1120px,calc(100% - 36px));margin:0 auto;padding:18px 0 24px;color:#667085;font-size:12px;line-height:1.5;}',
+    '.tool-version-footer__inner{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 16px;padding-top:12px;border-top:1px solid #d9dee8;}',
     '@media(max-width:700px){.site-nav__inner{width:min(100% - 24px,1120px);min-height:50px;gap:8px;}.site-nav__brand{font-size:14px;}.site-nav__version{font-size:10px;}.site-nav__link{font-size:12px;padding:7px 8px;}.site-nav__tools{display:none;}.site-nav__menus{overflow-x:auto;scrollbar-width:none;}.site-nav__menus::-webkit-scrollbar{display:none;}}'
   ].join('');
   document.head.appendChild(style);
@@ -98,9 +100,25 @@
   setNavContent('');
 
   document.body.insertBefore(nav, document.body.firstChild);
+  appendToolVersionFooter();
 
   fetch('/api/tools', { cache: 'no-store' })
     .then(function (response) { return response.json(); })
     .then(function (data) { setNavContent(renderCategories(data.tools)); })
     .catch(function () { setNavContent(''); });
+
+  function appendToolVersionFooter() {
+    if (window.location.pathname.indexOf('/tools/') !== 0) return;
+    if (document.querySelector('.tool-version-footer')) return;
+
+    var footer = document.createElement('footer');
+    footer.className = 'tool-version-footer';
+    footer.innerHTML = [
+      '<div class="tool-version-footer__inner">',
+      '<span>HTML Tools v' + escapeHtml(APP_VERSION) + '</span>',
+      '<span>&copy; ' + new Date().getFullYear() + ' EBM001. All rights reserved.</span>',
+      '</div>'
+    ].join('');
+    document.body.appendChild(footer);
+  }
 }());
