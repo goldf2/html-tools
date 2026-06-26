@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import type { ToolItem } from '@/lib/data';
+import packageInfo from '@/package.json';
 
 const STORAGE_KEY = 'html-tools-menu-preferences';
+const CURRENT_YEAR = new Date().getFullYear();
 
 function loadPreferences() {
   if (typeof window === 'undefined') return {};
@@ -207,9 +209,27 @@ export default function HomePage() {
           font-size: 14px;
         }
 
+        .site-footer {
+          max-width: 1100px;
+          margin: 0 auto;
+          padding: 0 32px 24px;
+          color: var(--muted);
+          font-size: 12px;
+        }
+
+        .site-footer__inner {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          gap: 8px 16px;
+          padding-top: 14px;
+          border-top: 1px solid var(--line);
+        }
+
         @media (max-width: 700px) {
           header,
-          main {
+          main,
+          .site-footer {
             padding-left: 18px;
             padding-right: 18px;
           }
@@ -276,6 +296,12 @@ export default function HomePage() {
           )}
         </section>
       </main>
+      <footer className="site-footer">
+        <div className="site-footer__inner">
+          <span>HTML Tools v{packageInfo.version}</span>
+          <span>© {CURRENT_YEAR} EBM001. All rights reserved.</span>
+        </div>
+      </footer>
     </>
   );
 }
