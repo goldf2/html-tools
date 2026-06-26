@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>高一兴趣爱好采集表</title>
+  <script src="/site-nav.js" defer></script>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --panel-soft: #f9fbff;
+      --text: #1f2937;
+      --muted: #667085;
+      --line: #d9e1ee;
+      --blue: #2563eb;
+      --teal: #0f766e;
+      --rose: #be3455;
+      --amber: #b45309;
+      --focus: rgba(37, 99, 235, 0.14);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.72), rgba(245,247,251,0.96)),
+        radial-gradient(circle at 16% 8%, rgba(37, 99, 235, 0.14), transparent 28%),
+        radial-gradient(circle at 82% 4%, rgba(15, 118, 110, 0.12), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      letter-spacing: 0;
+    }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,0.86);
+    }
+
+    .hero {
+      width: min(1080px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 34px 0 26px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: end;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--teal);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.14;
+    }
+
+    .subtitle {
+      max-width: 680px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .save-note {
+      min-width: 168px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    main {
+      width: min(1080px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 24px 0 46px;
+    }
+
+    form {
+      display: grid;
+      gap: 16px;
+    }
+
+    fieldset {
+      margin: 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    legend {
+      padding: 0 8px;
+      color: var(--blue);
+      font-size: 17px;
+      font-weight: 750;
+    }
+
+    .section-intro {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .grid.full {
+      grid-template-columns: 1fr;
+    }
+
+    .form-group {
+      min-width: 0;
+    }
+
+    label,
+    .group-label {
+      display: block;
+      margin: 0 0 8px;
+      color: #344054;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .required::after {
+      content: " *";
+      color: var(--rose);
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      min-height: 44px;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      font-size: 15px;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    textarea {
+      min-height: 86px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus,
+    .tag-box:focus-within {
+      outline: none;
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px var(--focus);
+    }
+
+    .hint {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-soft);
+      color: #344054;
+      font-size: 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .option:hover {
+      border-color: #9db4da;
+      background: #f2f6ff;
+    }
+
+    .option input {
+      width: 17px;
+      height: 17px;
+      margin: 0;
+      accent-color: var(--blue);
+      flex: 0 0 auto;
+    }
+
+    .option.checked {
+      border-color: var(--blue);
+      background: #eef4ff;
+      color: #174ea6;
+      font-weight: 700;
+    }
+
+    .tag-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 46px;
+      padding: 7px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .tag-box input {
+      flex: 1;
+      min-width: 180px;
+      min-height: 30px;
+      padding: 2px 4px;
+      border: 0;
+      box-shadow: none;
+      background: transparent;
+    }
+
+    .tag-box input:focus {
+      box-shadow: none;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 30px;
+      padding: 4px 9px;
+      border-radius: 8px;
+      background: #e6f4f1;
+      color: #0f766e;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .tag button {
+      width: 20px;
+      height: 20px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .range-row {
+      display: grid;
+      grid-template-columns: 1fr 48px;
+      gap: 14px;
+      align-items: center;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--teal);
+    }
+
+    .range-value {
+      min-height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: #e6f4f1;
+      color: var(--teal);
+      font-weight: 800;
+    }
+
+    .actions {
+      position: sticky;
+      bottom: 0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 14px 0 0;
+      background: linear-gradient(180deg, rgba(245,247,251,0), var(--bg) 42%);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .btn {
+      min-height: 44px;
+      padding: 10px 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      border-color: #9db4da;
+      background: #f8fbff;
+    }
+
+    .btn-primary {
+      border-color: var(--blue);
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+
+    .preview {
+      display: none;
+      margin-top: 18px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .preview.show {
+      display: block;
+    }
+
+    .preview h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+    }
+
+    .preview-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .preview-table th,
+    .preview-table td {
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    .preview-table th {
+      width: 180px;
+      color: #344054;
+      background: #f6f8fc;
+      font-weight: 750;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      top: 18px;
+      transform: translate(-50%, -80px);
+      max-width: calc(100% - 28px);
+      padding: 12px 16px;
+      border-radius: 8px;
+      background: #1f2937;
+      color: #fff;
+      font-size: 14px;
+      box-shadow: 0 12px 28px rgba(31, 41, 55, 0.2);
+      transition: transform 0.24s ease;
+      z-index: 20;
+    }
+
+    .toast.show {
+      transform: translate(-50%, 0);
+    }
+
+    @media (max-width: 720px) {
+      .hero {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .save-note {
+        min-width: 0;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      fieldset {
+        padding: 18px;
+      }
+
+      .actions {
+        flex-direction: column-reverse;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hero">
+      <div>
+        <p class="eyebrow">高一 · 兴趣探索</p>
+        <h1>兴趣爱好采集表</h1>
+        <p class="subtitle">适合高中女生自己填写，用来整理学科偏好、课外兴趣、技能方向、性格节奏和未来想尝试的事情。填写完成后可一键导出 CSV。</p>
+      </div>
+      <div class="save-note">导出的 CSV 会保存在浏览器默认下载目录，文件名包含填写人昵称和日期。</div>
+    </div>
+  </header>
+
+  <main>
+    <form id="interestForm">
+      <fieldset>
+        <legend>基本信息</legend>
+        <p class="section-intro">先记录最基础的信息，方便以后对照不同阶段的兴趣变化。</p>
+        <div class="grid">
+          <div class="form-group">
+            <label class="required" for="name">昵称或姓名</label>
+            <input id="name" name="name" type="text" autocomplete="name" placeholder="例如：小许、Luna" required>
+          </div>
+          <div class="form-group">
+            <label class="required" for="grade">年级</label>
+            <select id="grade" name="grade" required>
+              <option value="高一" selected>高一</option>
+              <option value="高二">高二</option>
+              <option value="高三">高三</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="city">所在城市</label>
+            <input id="city" name="city" type="text" placeholder="例如：上海、杭州">
+          </div>
+          <div class="form-group">
+            <label for="fillDate">填写日期</label>
+            <input id="fillDate" name="fillDate" type="text" readonly>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>学科兴趣</legend>
+        <p class="section-intro">不只看成绩，也记录“愿不愿意继续探索”。</p>
+        <div class="grid full">
+          <div class="form-group">
+            <span class="group-label required">喜欢或愿意投入的学科</span>
+            <div class="options">
+              <label class="option"><input type="checkbox" name="subjects" value="语文"><span>语文</span></label>
+              <label class="option"><input type="checkbox" name="subjects" value="数学"><span>数学</span></label>
+              <label class="option"><input type="checkbox" name="subjects" value="英语"><span>英语</span></label>
+              <label class="option"><input type="checkbox" name="subjects" value="物理"><span>物理</span></label>
+              <label class="option"><input type="checkbox" name="subjects" value="化学"><span>化学</span></label>
+              <label class="option"><input type="checkbox" name="subjects" value="生物"><span>生物</span></label>
+              <label class="option"><input type="checkbox" name="subjects" value="历史"><span>历史</span></label>
+              <label class="option"><input type="checkbox" name="subjects" value="地理"><span>地理</span></label>
+              <label class="option"><input type="checkbox" name="subjects" value="政治"><span>政治</span></label>
+              <label class="option"><input type="checkbox" name="subjects" value="信息技术"><span>信息技术</span></label>
+              <label class="option"><input type="checkbox" name="subjects" value="美术"><span>美术</span></label>
+              <label class="option"><input type="checkbox" name="subjects" value="音乐"><span>音乐</span></label>
+            </div>
+          </div>
+          <div class="grid">
+            <div class="form-group">
+              <label for="strongSubject">目前最有优势的学科</label>
+              <input id="strongSubject" name="strongSubject" type="text" placeholder="例如：英语、生物">
+            </div>
+            <div class="form-group">
+              <label for="challengeSubject">想提升的学科</label>
+              <input id="challengeSubject" name="challengeSubject" type="text" placeholder="例如：数学、物理">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="subjectReason">喜欢这些学科的原因</label>
+            <textarea id="subjectReason" name="subjectReason" placeholder="可以写老师、成就感、内容有趣、和未来方向有关等。"></textarea>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>课外兴趣</legend>
+        <p class="section-intro">把正在做、做过、想继续做的兴趣都放进来。</p>
+        <div class="grid full">
+          <div class="form-group">
+            <span class="group-label required">已有或感兴趣的爱好</span>
+            <div class="options">
+              <label class="option"><input type="checkbox" name="hobbies" value="阅读"><span>阅读</span></label>
+              <label class="option"><input type="checkbox" name="hobbies" value="写作"><span>写作</span></label>
+              <label class="option"><input type="checkbox" name="hobbies" value="绘画/设计"><span>绘画/设计</span></label>
+              <label class="option"><input type="checkbox" name="hobbies" value="摄影"><span>摄影</span></label>
+              <label class="option"><input type="checkbox" name="hobbies" value="视频剪辑"><span>视频剪辑</span></label>
+              <label class="option"><input type="checkbox" name="hobbies" value="音乐/乐器"><span>音乐/乐器</span></label>
+              <label class="option"><input type="checkbox" name="hobbies" value="舞蹈"><span>舞蹈</span></label>
+              <label class="option"><input type="checkbox" name="hobbies" value="运动健身"><span>运动健身</span></label>
+              <label class="option"><input type="checkbox" name="hobbies" value="手工/DIY"><span>手工/DIY</span></label>
+              <label class="option"><input type="checkbox" name="hobbies" value="烘焙/料理"><span>烘焙/料理</span></label>
+              <label class="option"><input type="checkbox" name="hobbies" value="动漫/影视"><span>动漫/影视</span></label>
+              <label class="option"><input type="checkbox" name="hobbies" value="穿搭/审美"><span>穿搭/审美</span></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="customHobbiesInput">自定义兴趣标签</label>
+            <div class="tag-box" id="customHobbiesBox">
+              <input id="customHobbiesInput" type="text" placeholder="输入后按回车，例如：辩论、播客、滑板">
+            </div>
+            <input id="customHobbies" type="hidden">
+          </div>
+          <div class="grid">
+            <div class="form-group">
+              <label for="favoriteHobby">最想长期坚持的一项</label>
+              <input id="favoriteHobby" name="favoriteHobby" type="text" placeholder="例如：摄影、羽毛球">
+            </div>
+            <div class="form-group">
+              <label for="hobbyTime">每周可投入时间</label>
+              <select id="hobbyTime" name="hobbyTime">
+                <option value="">请选择</option>
+                <option value="1小时以内">1小时以内</option>
+                <option value="1-3小时">1-3小时</option>
+                <option value="3-6小时">3-6小时</option>
+                <option value="6小时以上">6小时以上</option>
+                <option value="暂时不固定">暂时不固定</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>数字技能与表达</legend>
+        <p class="section-intro">记录电脑、AI、创作工具和表达方式上的兴趣。</p>
+        <div class="grid full">
+          <div class="form-group">
+            <span class="group-label">想学习或继续提升的技能</span>
+            <div class="options">
+              <label class="option"><input type="checkbox" name="skills" value="办公软件/PPT"><span>办公软件/PPT</span></label>
+              <label class="option"><input type="checkbox" name="skills" value="编程/网站"><span>编程/网站</span></label>
+              <label class="option"><input type="checkbox" name="skills" value="AI工具"><span>AI工具</span></label>
+              <label class="option"><input type="checkbox" name="skills" value="平面设计"><span>平面设计</span></label>
+              <label class="option"><input type="checkbox" name="skills" value="视频剪辑"><span>视频剪辑</span></label>
+              <label class="option"><input type="checkbox" name="skills" value="数据分析"><span>数据分析</span></label>
+              <label class="option"><input type="checkbox" name="skills" value="公开表达"><span>公开表达</span></label>
+              <label class="option"><input type="checkbox" name="skills" value="新媒体运营"><span>新媒体运营</span></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="wantLearnInput">其他想学内容</label>
+            <div class="tag-box" id="wantLearnBox">
+              <input id="wantLearnInput" type="text" placeholder="输入后按回车，例如：Python、建模、播音">
+            </div>
+            <input id="wantLearn" type="hidden">
+          </div>
+          <div class="form-group">
+            <label for="techConfidence">使用电脑和软件的信心程度</label>
+            <div class="range-row">
+              <input id="techConfidence" name="techConfidence" type="range" min="1" max="10" value="5">
+              <span class="range-value" id="techConfidenceValue">5</span>
+            </div>
+            <p class="hint">1 表示需要很多帮助，10 表示可以自己探索解决。</p>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>偏好的学习与生活节奏</legend>
+        <p class="section-intro">这些答案有助于安排兴趣课、社团、竞赛或周末活动。</p>
+        <div class="grid">
+          <div class="form-group">
+            <span class="group-label">更喜欢的学习方式</span>
+            <div class="options">
+              <label class="option"><input type="radio" name="learnStyle" value="自己安静研究"><span>自己安静研究</span></label>
+              <label class="option"><input type="radio" name="learnStyle" value="有人带着练"><span>有人带着练</span></label>
+              <label class="option"><input type="radio" name="learnStyle" value="和同伴一起"><span>和同伴一起</span></label>
+              <label class="option"><input type="radio" name="learnStyle" value="项目实践"><span>项目实践</span></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <span class="group-label">课外活动节奏</span>
+            <div class="options">
+              <label class="option"><input type="radio" name="pace" value="轻松低压力"><span>轻松低压力</span></label>
+              <label class="option"><input type="radio" name="pace" value="稳定每周练习"><span>稳定每周练习</span></label>
+              <label class="option"><input type="radio" name="pace" value="阶段性冲刺"><span>阶段性冲刺</span></label>
+              <label class="option"><input type="radio" name="pace" value="挑战比赛/展示"><span>挑战比赛/展示</span></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="weekendPreference">周末更想怎么安排</label>
+            <textarea id="weekendPreference" name="weekendPreference" placeholder="例如：半天学习，半天运动；想留一点自由时间。"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="avoid">不太喜欢或暂时不想尝试的事情</label>
+            <textarea id="avoid" name="avoid" placeholder="例如：太早起、太卷的竞赛、频繁表演等。"></textarea>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>未来探索</legend>
+        <p class="section-intro">不要求现在确定答案，只把好奇心先存下来。</p>
+        <div class="grid">
+          <div class="form-group">
+            <label for="dreamMajor">好奇的专业或方向</label>
+            <input id="dreamMajor" name="dreamMajor" type="text" placeholder="例如：心理学、设计、医学、计算机">
+          </div>
+          <div class="form-group">
+            <label for="dreamJob">想象中的职业</label>
+            <input id="dreamJob" name="dreamJob" type="text" placeholder="可以很具体，也可以很模糊">
+          </div>
+          <div class="form-group">
+            <label for="roleModel">欣赏的人或作品</label>
+            <input id="roleModel" name="roleModel" type="text" placeholder="现实人物、作者、导演、角色都可以">
+          </div>
+          <div class="form-group">
+            <label for="supportNeeded">希望家里提供的支持</label>
+            <input id="supportNeeded" name="supportNeeded" type="text" placeholder="例如：买书、报课、一起参观、给时间">
+          </div>
+          <div class="form-group">
+            <label for="thisSemesterGoal">这个学期想完成的一件小事</label>
+            <textarea id="thisSemesterGoal" name="thisSemesterGoal" placeholder="例如：读完三本书、做一个短视频、学会一种运动动作。"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="selfNote">给自己的话</label>
+            <textarea id="selfNote" name="selfNote" placeholder="写一句鼓励、提醒或期待。"></textarea>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="actions">
+        <button class="btn" type="button" id="previewBtn">预览数据</button>
+        <button class="btn btn-primary" type="button" id="exportBtn">导出 CSV</button>
+      </div>
+    </form>
+
+    <section class="preview" id="previewSection" aria-live="polite">
+      <h2>数据预览</h2>
+      <div id="previewContent"></div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const today = new Date();
+    document.getElementById('fillDate').value = today.toISOString().slice(0, 10);
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove('show'), 2600);
+    }
+
+    function setupOptionState() {
+      document.querySelectorAll('.option input').forEach((input) => {
+        const update = () => {
+          if (input.type === 'radio') {
+            document.querySelectorAll(`input[name="${input.name}"]`).forEach((peer) => {
+              peer.closest('.option').classList.toggle('checked', peer.checked);
+            });
+          } else {
+            input.closest('.option').classList.toggle('checked', input.checked);
+          }
+        };
+        input.addEventListener('change', update);
+        update();
+      });
+    }
+
+    function setupTagInput(inputId, boxId, hiddenId) {
+      const input = document.getElementById(inputId);
+      const box = document.getElementById(boxId);
+      const hidden = document.getElementById(hiddenId);
+      const tags = [];
+
+      function sync() {
+        hidden.value = tags.join('、');
+      }
+
+      function addTag(rawText) {
+        const text = rawText.trim();
+        if (!text || tags.includes(text)) return;
+        tags.push(text);
+
+        const tag = document.createElement('span');
+        tag.className = 'tag';
+        tag.textContent = text;
+
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.setAttribute('aria-label', `删除 ${text}`);
+        remove.textContent = '×';
+        remove.addEventListener('click', () => {
+          const index = tags.indexOf(text);
+          if (index >= 0) tags.splice(index, 1);
+          tag.remove();
+          sync();
+        });
+
+        tag.appendChild(remove);
+        box.insertBefore(tag, input);
+        sync();
+      }
+
+      input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          addTag(input.value);
+          input.value = '';
+        }
+
+        if (event.key === 'Backspace' && input.value === '' && tags.length) {
+          const lastTag = tags.pop();
+          const tagNodes = box.querySelectorAll('.tag');
+          if (tagNodes.length) tagNodes[tagNodes.length - 1].remove();
+          sync();
+        }
+      });
+
+      input.addEventListener('blur', () => {
+        if (input.value.trim()) {
+          addTag(input.value);
+          input.value = '';
+        }
+      });
+    }
+
+    function getChecked(name) {
+      return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`))
+        .map((input) => input.value)
+        .join('、');
+    }
+
+    function getValue(id) {
+      return document.getElementById(id).value.trim();
+    }
+
+    function collectData() {
+      return {
+        '填写日期': getValue('fillDate'),
+        '昵称或姓名': getValue('name'),
+        '年级': getValue('grade'),
+        '所在城市': getValue('city'),
+        '喜欢或愿意投入的学科': getChecked('subjects'),
+        '目前最有优势的学科': getValue('strongSubject'),
+        '想提升的学科': getValue('challengeSubject'),
+        '喜欢学科的原因': getValue('subjectReason'),
+        '已有或感兴趣的爱好': getChecked('hobbies'),
+        '自定义兴趣标签': getValue('customHobbies'),
+        '最想长期坚持的一项': getValue('favoriteHobby'),
+        '每周可投入时间': getValue('hobbyTime'),
+        '想学习或提升的技能': getChecked('skills'),
+        '其他想学内容': getValue('wantLearn'),
+        '电脑和软件信心值': getValue('techConfidence'),
+        '更喜欢的学习方式': getChecked('learnStyle'),
+        '课外活动节奏': getChecked('pace'),
+        '周末安排偏好': getValue('weekendPreference'),
+        '不喜欢或暂不想尝试': getValue('avoid'),
+        '好奇的专业或方向': getValue('dreamMajor'),
+        '想象中的职业': getValue('dreamJob'),
+        '欣赏的人或作品': getValue('roleModel'),
+        '希望家里提供的支持': getValue('supportNeeded'),
+        '本学期小目标': getValue('thisSemesterGoal'),
+        '给自己的话': getValue('selfNote')
+      };
+    }
+
+    function validateData(data) {
+      if (!data['昵称或姓名']) {
+        document.getElementById('name').focus();
+        showToast('请先填写昵称或姓名');
+        return false;
+      }
+      if (!data['喜欢或愿意投入的学科']) {
+        showToast('请至少选择一个喜欢或愿意投入的学科');
+        return false;
+      }
+      if (!data['已有或感兴趣的爱好'] && !data['自定义兴趣标签']) {
+        showToast('请至少选择或填写一个兴趣爱好');
+        return false;
+      }
+      return true;
+    }
+
+    function escapeHtml(text) {
+      return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function previewData() {
+      const data = collectData();
+      const rows = Object.entries(data).map(([key, value]) => (
+        `<tr><th>${escapeHtml(key)}</th><td>${escapeHtml(value || '-')}</td></tr>`
+      )).join('');
+      document.getElementById('previewContent').innerHTML = `<table class="preview-table">${rows}</table>`;
+      document.getElementById('previewSection').classList.add('show');
+      document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function csvCell(value) {
+      const text = String(value || '');
+      return `"${text.replace(/"/g, '""')}"`;
+    }
+
+    function exportCsv() {
+      const data = collectData();
+      if (!validateData(data)) return;
+
+      const headers = Object.keys(data).map(csvCell).join(',');
+      const values = Object.values(data).map(csvCell).join(',');
+      const csv = `\uFEFF${headers}\n${values}\n`;
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const safeName = (data['昵称或姓名'] || '高一女生').replace(/[\\/:*?"<>|]/g, '_');
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${safeName}_兴趣爱好采集_${data['填写日期']}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      showToast('CSV 已导出');
+    }
+
+    const techConfidence = document.getElementById('techConfidence');
+    const techConfidenceValue = document.getElementById('techConfidenceValue');
+    techConfidence.addEventListener('input', () => {
+      techConfidenceValue.textContent = techConfidence.value;
+    });
+
+    setupOptionState();
+    setupTagInput('customHobbiesInput', 'customHobbiesBox', 'customHobbies');
+    setupTagInput('wantLearnInput', 'wantLearnBox', 'wantLearn');
+    document.getElementById('previewBtn').addEventListener('click', previewData);
+    document.getElementById('exportBtn').addEventListener('click', exportCsv);
+  </script>
+</body>
+</html>

@@ -1,0 +1,1177 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>暑期旅游兴趣点采集表</title>
+  <script src="/site-nav.js" defer></script>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f8fb;
+      --panel: #ffffff;
+      --soft: #f8fbff;
+      --text: #20242c;
+      --muted: #667085;
+      --line: #d8e1ec;
+      --blue: #2563eb;
+      --cyan: #0e7490;
+      --green: #15803d;
+      --orange: #c2410c;
+      --focus: rgba(14, 116, 144, 0.16);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.72), rgba(245,248,251,0.98)),
+        radial-gradient(circle at 12% 6%, rgba(37, 99, 235, 0.13), transparent 30%),
+        radial-gradient(circle at 84% 4%, rgba(21, 128, 61, 0.12), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      letter-spacing: 0;
+    }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,0.88);
+    }
+
+    .hero,
+    main {
+      width: min(1120px, calc(100% - 36px));
+      margin: 0 auto;
+    }
+
+    .hero {
+      padding: 34px 0 26px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 22px;
+      align-items: end;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--cyan);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.12;
+    }
+
+    .subtitle {
+      max-width: 720px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .summary-box {
+      min-width: 190px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    main {
+      padding: 24px 0 46px;
+    }
+
+    form {
+      display: grid;
+      gap: 16px;
+    }
+
+    fieldset {
+      margin: 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    legend {
+      padding: 0 8px;
+      color: var(--cyan);
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .section-intro {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .grid.full {
+      grid-template-columns: 1fr;
+    }
+
+    .form-group { min-width: 0; }
+
+    label,
+    .group-label {
+      display: block;
+      margin: 0 0 8px;
+      color: #344054;
+      font-size: 14px;
+      font-weight: 680;
+    }
+
+    .required::after {
+      content: " *";
+      color: var(--orange);
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      min-height: 44px;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      font-size: 15px;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    textarea {
+      min-height: 82px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus,
+    .tag-box:focus-within {
+      outline: none;
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 4px var(--focus);
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+      gap: 10px;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--soft);
+      color: #344054;
+      font-size: 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .option:hover {
+      border-color: #8db8c8;
+      background: #eef9fc;
+    }
+
+    .option input {
+      width: 17px;
+      height: 17px;
+      margin: 0;
+      accent-color: var(--cyan);
+      flex: 0 0 auto;
+    }
+
+    .option.checked {
+      border-color: var(--cyan);
+      background: #e6f7fb;
+      color: #155e75;
+      font-weight: 760;
+    }
+
+    .hint {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .tag-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 46px;
+      padding: 7px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .tag-box input {
+      flex: 1;
+      min-width: 180px;
+      min-height: 30px;
+      padding: 2px 4px;
+      border: 0;
+      box-shadow: none;
+      background: transparent;
+    }
+
+    .tag-box input:focus {
+      box-shadow: none;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 30px;
+      padding: 4px 9px;
+      border-radius: 8px;
+      background: #e9f8ee;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 760;
+    }
+
+    .tag button {
+      width: 20px;
+      height: 20px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .scale-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .scale-table {
+      width: 100%;
+      min-width: 680px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .scale-table th,
+    .scale-table td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--line);
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .scale-table th {
+      background: #f6f8fc;
+      color: #344054;
+      font-weight: 760;
+    }
+
+    .scale-table tr:last-child th,
+    .scale-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .scale-table .scale-item {
+      width: 180px;
+      text-align: left;
+      color: var(--text);
+      font-weight: 720;
+    }
+
+    .scale-table input {
+      width: 17px;
+      height: 17px;
+      margin: 0;
+      accent-color: var(--cyan);
+    }
+
+    .scale-help {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .priority-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .priority-item {
+      display: grid;
+      grid-template-columns: 34px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      min-height: 44px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--soft);
+      color: #344054;
+      cursor: grab;
+      user-select: none;
+    }
+
+    .priority-item:active {
+      cursor: grabbing;
+    }
+
+    .priority-item.dragging {
+      opacity: 0.56;
+      border-color: var(--cyan);
+      background: #e6f7fb;
+    }
+
+    .priority-rank {
+      display: grid;
+      width: 28px;
+      height: 28px;
+      place-items: center;
+      border-radius: 999px;
+      background: #e6f7fb;
+      color: var(--cyan);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .priority-grip {
+      color: var(--muted);
+      font-size: 18px;
+      letter-spacing: 2px;
+    }
+
+    .actions {
+      position: sticky;
+      bottom: 0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 14px 0 0;
+      background: linear-gradient(180deg, rgba(245,248,251,0), var(--bg) 42%);
+    }
+
+    button { font: inherit; }
+
+    .btn {
+      min-height: 44px;
+      padding: 10px 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 780;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      border-color: #8db8c8;
+      background: #f8fcff;
+    }
+
+    .btn-primary {
+      border-color: var(--cyan);
+      background: var(--cyan);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #155e75;
+    }
+
+    .preview {
+      display: none;
+      margin-top: 18px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .preview.show { display: block; }
+
+    .preview h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+    }
+
+    .analysis {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding: 14px;
+      border-left: 4px solid var(--green);
+      border-radius: 0 8px 8px 0;
+      background: #f0fdf4;
+      color: #14532d;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .analysis b {
+      color: #166534;
+    }
+
+    .preview-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .preview-table th,
+    .preview-table td {
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    .preview-table th {
+      width: 190px;
+      color: #344054;
+      background: #f6f8fc;
+      font-weight: 780;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      top: 18px;
+      transform: translate(-50%, -80px);
+      max-width: calc(100% - 28px);
+      padding: 12px 16px;
+      border-radius: 8px;
+      background: #1f2937;
+      color: #fff;
+      font-size: 14px;
+      box-shadow: 0 12px 28px rgba(31, 41, 55, 0.2);
+      transition: transform 0.24s ease;
+      z-index: 20;
+    }
+
+    .toast.show { transform: translate(-50%, 0); }
+
+    @media (max-width: 760px) {
+      .hero {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .summary-box { min-width: 0; }
+
+      fieldset { padding: 18px; }
+
+      .grid { grid-template-columns: 1fr; }
+
+      .actions {
+        flex-direction: column-reverse;
+      }
+
+      .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hero">
+      <div>
+        <p class="eyebrow">暑期 · 旅游兴趣点</p>
+        <h1>暑期旅游兴趣点采集表</h1>
+        <p class="subtitle">用问卷方式收集目的地类型、活动偏好、预算、天数、交通、住宿和限制条件；主观偏好尽量使用 1-5 李克特量表，导出 CSV 后更便于分析合适的暑期旅游地点。</p>
+      </div>
+      <div class="summary-box">1 = 很不喜欢 / 很不重要，5 = 非常喜欢 / 非常重要。CSV 会保留每个评分列。</div>
+    </div>
+  </header>
+
+  <main>
+    <form id="travelForm">
+      <fieldset>
+        <legend>基础信息</legend>
+        <p class="section-intro">先确认出行背景，后续分析会优先匹配天数、预算和同行方式。</p>
+        <div class="grid">
+          <div class="form-group">
+            <label class="required" for="name">填写人昵称</label>
+            <input id="name" name="name" type="text" placeholder="例如：小许、Luna" required>
+          </div>
+          <div class="form-group">
+            <label for="fillDate">填写日期</label>
+            <input id="fillDate" name="fillDate" type="text" readonly>
+          </div>
+          <div class="form-group">
+            <label class="required">同行方式</label>
+            <div class="options">
+              <label class="option"><input type="radio" name="companions" value="父母同行"><span>父母同行</span></label>
+              <label class="option"><input type="radio" name="companions" value="亲友家庭"><span>亲友家庭</span></label>
+              <label class="option"><input type="radio" name="companions" value="同学朋友"><span>同学朋友</span></label>
+              <label class="option"><input type="radio" name="companions" value="研学/营地"><span>研学/营地</span></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="required">计划天数</label>
+            <div class="options">
+              <label class="option"><input type="radio" name="duration" value="1-2天"><span>1-2天</span></label>
+              <label class="option"><input type="radio" name="duration" value="3-5天"><span>3-5天</span></label>
+              <label class="option"><input type="radio" name="duration" value="6-8天"><span>6-8天</span></label>
+              <label class="option"><input type="radio" name="duration" value="9天以上"><span>9天以上</span></label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>目的地偏好</legend>
+        <p class="section-intro">这些选项会直接影响推荐方向，例如海滨、城市、人文或自然探索。</p>
+        <div class="grid full">
+          <div class="form-group">
+            <span class="group-label required">可接受的目的地类型（多选）</span>
+            <div class="options">
+              <label class="option"><input type="checkbox" name="destinationTypes" value="海滨海岛"><span>海滨海岛</span></label>
+              <label class="option"><input type="checkbox" name="destinationTypes" value="山水自然"><span>山水自然</span></label>
+              <label class="option"><input type="checkbox" name="destinationTypes" value="古城古镇"><span>古城古镇</span></label>
+              <label class="option"><input type="checkbox" name="destinationTypes" value="现代都市"><span>现代都市</span></label>
+              <label class="option"><input type="checkbox" name="destinationTypes" value="草原沙漠"><span>草原沙漠</span></label>
+              <label class="option"><input type="checkbox" name="destinationTypes" value="森林湖泊"><span>森林湖泊</span></label>
+              <label class="option"><input type="checkbox" name="destinationTypes" value="主题乐园"><span>主题乐园</span></label>
+              <label class="option"><input type="checkbox" name="destinationTypes" value="博物馆/科技馆"><span>博物馆/科技馆</span></label>
+              <label class="option"><input type="checkbox" name="destinationTypes" value="高校/研学城市"><span>高校/研学城市</span></label>
+              <label class="option"><input type="checkbox" name="destinationTypes" value="避暑小城"><span>避暑小城</span></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <span class="group-label required">目的地类型兴趣评分（1-5）</span>
+            <div class="scale-table-wrap">
+              <table class="scale-table" data-scale-group="destinationRatings">
+                <thead>
+                  <tr><th class="scale-item">类型</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+                </thead>
+                <tbody>
+                  <tr data-label="海滨海岛"><th class="scale-item">海滨海岛</th><td><input type="radio" name="rate_dest_海滨海岛" value="1"></td><td><input type="radio" name="rate_dest_海滨海岛" value="2"></td><td><input type="radio" name="rate_dest_海滨海岛" value="3"></td><td><input type="radio" name="rate_dest_海滨海岛" value="4"></td><td><input type="radio" name="rate_dest_海滨海岛" value="5"></td></tr>
+                  <tr data-label="山水自然"><th class="scale-item">山水自然</th><td><input type="radio" name="rate_dest_山水自然" value="1"></td><td><input type="radio" name="rate_dest_山水自然" value="2"></td><td><input type="radio" name="rate_dest_山水自然" value="3"></td><td><input type="radio" name="rate_dest_山水自然" value="4"></td><td><input type="radio" name="rate_dest_山水自然" value="5"></td></tr>
+                  <tr data-label="古城古镇"><th class="scale-item">古城古镇</th><td><input type="radio" name="rate_dest_古城古镇" value="1"></td><td><input type="radio" name="rate_dest_古城古镇" value="2"></td><td><input type="radio" name="rate_dest_古城古镇" value="3"></td><td><input type="radio" name="rate_dest_古城古镇" value="4"></td><td><input type="radio" name="rate_dest_古城古镇" value="5"></td></tr>
+                  <tr data-label="现代都市"><th class="scale-item">现代都市</th><td><input type="radio" name="rate_dest_现代都市" value="1"></td><td><input type="radio" name="rate_dest_现代都市" value="2"></td><td><input type="radio" name="rate_dest_现代都市" value="3"></td><td><input type="radio" name="rate_dest_现代都市" value="4"></td><td><input type="radio" name="rate_dest_现代都市" value="5"></td></tr>
+                  <tr data-label="主题乐园"><th class="scale-item">主题乐园</th><td><input type="radio" name="rate_dest_主题乐园" value="1"></td><td><input type="radio" name="rate_dest_主题乐园" value="2"></td><td><input type="radio" name="rate_dest_主题乐园" value="3"></td><td><input type="radio" name="rate_dest_主题乐园" value="4"></td><td><input type="radio" name="rate_dest_主题乐园" value="5"></td></tr>
+                  <tr data-label="研学城市"><th class="scale-item">研学城市</th><td><input type="radio" name="rate_dest_研学城市" value="1"></td><td><input type="radio" name="rate_dest_研学城市" value="2"></td><td><input type="radio" name="rate_dest_研学城市" value="3"></td><td><input type="radio" name="rate_dest_研学城市" value="4"></td><td><input type="radio" name="rate_dest_研学城市" value="5"></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="scale-help"><span>1 很不想去</span><span>3 可以考虑</span><span>5 非常想去</span></div>
+          </div>
+          <div class="grid">
+            <div class="form-group">
+              <label class="required">气候偏好（单选）</label>
+              <div class="options">
+                <label class="option"><input type="radio" name="climate" value="凉爽避暑"><span>凉爽避暑</span></label>
+                <label class="option"><input type="radio" name="climate" value="温暖舒适"><span>温暖舒适</span></label>
+                <label class="option"><input type="radio" name="climate" value="可以接受炎热"><span>可以接受炎热</span></label>
+                <label class="option"><input type="radio" name="climate" value="无明显偏好"><span>无明显偏好</span></label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="required">人流接受度（单选）</label>
+              <div class="options">
+                <label class="option"><input type="radio" name="crowd" value="尽量人少安静"><span>尽量人少安静</span></label>
+                <label class="option"><input type="radio" name="crowd" value="适中即可"><span>适中即可</span></label>
+                <label class="option"><input type="radio" name="crowd" value="热门热闹也可以"><span>热门热闹也可以</span></label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="wantedPlacesInput">特别想去的地方</label>
+            <div class="tag-box" id="wantedPlacesBox">
+              <input id="wantedPlacesInput" type="text" placeholder="输入后按回车，例如：大理、厦门、成都、新疆">
+            </div>
+            <input id="wantedPlaces" type="hidden">
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>兴趣活动</legend>
+        <p class="section-intro">活动偏好比城市名更关键，适合用来反推旅游地点。</p>
+        <div class="grid full">
+          <div class="form-group">
+            <span class="group-label required">可接受或想体验的活动（多选）</span>
+            <div class="options">
+              <label class="option"><input type="checkbox" name="activities" value="自然风光"><span>自然风光</span></label>
+              <label class="option"><input type="checkbox" name="activities" value="人文历史"><span>人文历史</span></label>
+              <label class="option"><input type="checkbox" name="activities" value="博物馆展览"><span>博物馆展览</span></label>
+              <label class="option"><input type="checkbox" name="activities" value="科技体验"><span>科技体验</span></label>
+              <label class="option"><input type="checkbox" name="activities" value="美食探店"><span>美食探店</span></label>
+              <label class="option"><input type="checkbox" name="activities" value="拍照打卡"><span>拍照打卡</span></label>
+              <label class="option"><input type="checkbox" name="activities" value="户外运动"><span>户外运动</span></label>
+              <label class="option"><input type="checkbox" name="activities" value="水上项目"><span>水上项目</span></label>
+              <label class="option"><input type="checkbox" name="activities" value="演出/音乐节"><span>演出/音乐节</span></label>
+              <label class="option"><input type="checkbox" name="activities" value="手作体验"><span>手作体验</span></label>
+              <label class="option"><input type="checkbox" name="activities" value="购物逛街"><span>购物逛街</span></label>
+              <label class="option"><input type="checkbox" name="activities" value="休闲放松"><span>休闲放松</span></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <span class="group-label required">活动兴趣评分（1-5）</span>
+            <div class="scale-table-wrap">
+              <table class="scale-table" data-scale-group="activityRatings">
+                <thead>
+                  <tr><th class="scale-item">活动</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+                </thead>
+                <tbody>
+                  <tr data-label="自然风光"><th class="scale-item">自然风光</th><td><input type="radio" name="rate_act_自然风光" value="1"></td><td><input type="radio" name="rate_act_自然风光" value="2"></td><td><input type="radio" name="rate_act_自然风光" value="3"></td><td><input type="radio" name="rate_act_自然风光" value="4"></td><td><input type="radio" name="rate_act_自然风光" value="5"></td></tr>
+                  <tr data-label="人文历史"><th class="scale-item">人文历史</th><td><input type="radio" name="rate_act_人文历史" value="1"></td><td><input type="radio" name="rate_act_人文历史" value="2"></td><td><input type="radio" name="rate_act_人文历史" value="3"></td><td><input type="radio" name="rate_act_人文历史" value="4"></td><td><input type="radio" name="rate_act_人文历史" value="5"></td></tr>
+                  <tr data-label="博物馆展览"><th class="scale-item">博物馆展览</th><td><input type="radio" name="rate_act_博物馆展览" value="1"></td><td><input type="radio" name="rate_act_博物馆展览" value="2"></td><td><input type="radio" name="rate_act_博物馆展览" value="3"></td><td><input type="radio" name="rate_act_博物馆展览" value="4"></td><td><input type="radio" name="rate_act_博物馆展览" value="5"></td></tr>
+                  <tr data-label="美食探店"><th class="scale-item">美食探店</th><td><input type="radio" name="rate_act_美食探店" value="1"></td><td><input type="radio" name="rate_act_美食探店" value="2"></td><td><input type="radio" name="rate_act_美食探店" value="3"></td><td><input type="radio" name="rate_act_美食探店" value="4"></td><td><input type="radio" name="rate_act_美食探店" value="5"></td></tr>
+                  <tr data-label="拍照打卡"><th class="scale-item">拍照打卡</th><td><input type="radio" name="rate_act_拍照打卡" value="1"></td><td><input type="radio" name="rate_act_拍照打卡" value="2"></td><td><input type="radio" name="rate_act_拍照打卡" value="3"></td><td><input type="radio" name="rate_act_拍照打卡" value="4"></td><td><input type="radio" name="rate_act_拍照打卡" value="5"></td></tr>
+                  <tr data-label="户外运动"><th class="scale-item">户外运动</th><td><input type="radio" name="rate_act_户外运动" value="1"></td><td><input type="radio" name="rate_act_户外运动" value="2"></td><td><input type="radio" name="rate_act_户外运动" value="3"></td><td><input type="radio" name="rate_act_户外运动" value="4"></td><td><input type="radio" name="rate_act_户外运动" value="5"></td></tr>
+                  <tr data-label="水上项目"><th class="scale-item">水上项目</th><td><input type="radio" name="rate_act_水上项目" value="1"></td><td><input type="radio" name="rate_act_水上项目" value="2"></td><td><input type="radio" name="rate_act_水上项目" value="3"></td><td><input type="radio" name="rate_act_水上项目" value="4"></td><td><input type="radio" name="rate_act_水上项目" value="5"></td></tr>
+                  <tr data-label="休闲放松"><th class="scale-item">休闲放松</th><td><input type="radio" name="rate_act_休闲放松" value="1"></td><td><input type="radio" name="rate_act_休闲放松" value="2"></td><td><input type="radio" name="rate_act_休闲放松" value="3"></td><td><input type="radio" name="rate_act_休闲放松" value="4"></td><td><input type="radio" name="rate_act_休闲放松" value="5"></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="scale-help"><span>1 很不喜欢</span><span>3 一般可接受</span><span>5 非常喜欢</span></div>
+          </div>
+          <div class="grid">
+            <div class="form-group">
+              <label class="required">旅行节奏</label>
+              <div class="options">
+                <label class="option"><input type="radio" name="pace" value="轻松度假"><span>轻松度假</span></label>
+                <label class="option"><input type="radio" name="pace" value="每天1-2个重点"><span>每天1-2个重点</span></label>
+                <label class="option"><input type="radio" name="pace" value="高密度打卡"><span>高密度打卡</span></label>
+                <label class="option"><input type="radio" name="pace" value="研学式深度体验"><span>研学式深度体验</span></label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="required">体力强度</label>
+              <div class="options">
+                <label class="option"><input type="radio" name="physicalLevel" value="低强度"><span>低强度</span></label>
+                <label class="option"><input type="radio" name="physicalLevel" value="中等强度"><span>中等强度</span></label>
+                <label class="option"><input type="radio" name="physicalLevel" value="高强度"><span>高强度</span></label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <span class="group-label required">行程要素重要程度（1-5）</span>
+            <div class="scale-table-wrap">
+              <table class="scale-table" data-scale-group="factorRatings">
+                <thead>
+                  <tr><th class="scale-item">要素</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+                </thead>
+                <tbody>
+                  <tr data-label="安全便利"><th class="scale-item">安全便利</th><td><input type="radio" name="rate_factor_安全便利" value="1"></td><td><input type="radio" name="rate_factor_安全便利" value="2"></td><td><input type="radio" name="rate_factor_安全便利" value="3"></td><td><input type="radio" name="rate_factor_安全便利" value="4"></td><td><input type="radio" name="rate_factor_安全便利" value="5"></td></tr>
+                  <tr data-label="交通少折腾"><th class="scale-item">交通少折腾</th><td><input type="radio" name="rate_factor_交通少折腾" value="1"></td><td><input type="radio" name="rate_factor_交通少折腾" value="2"></td><td><input type="radio" name="rate_factor_交通少折腾" value="3"></td><td><input type="radio" name="rate_factor_交通少折腾" value="4"></td><td><input type="radio" name="rate_factor_交通少折腾" value="5"></td></tr>
+                  <tr data-label="住宿舒适"><th class="scale-item">住宿舒适</th><td><input type="radio" name="rate_factor_住宿舒适" value="1"></td><td><input type="radio" name="rate_factor_住宿舒适" value="2"></td><td><input type="radio" name="rate_factor_住宿舒适" value="3"></td><td><input type="radio" name="rate_factor_住宿舒适" value="4"></td><td><input type="radio" name="rate_factor_住宿舒适" value="5"></td></tr>
+                  <tr data-label="拍照出片"><th class="scale-item">拍照出片</th><td><input type="radio" name="rate_factor_拍照出片" value="1"></td><td><input type="radio" name="rate_factor_拍照出片" value="2"></td><td><input type="radio" name="rate_factor_拍照出片" value="3"></td><td><input type="radio" name="rate_factor_拍照出片" value="4"></td><td><input type="radio" name="rate_factor_拍照出片" value="5"></td></tr>
+                  <tr data-label="美食丰富"><th class="scale-item">美食丰富</th><td><input type="radio" name="rate_factor_美食丰富" value="1"></td><td><input type="radio" name="rate_factor_美食丰富" value="2"></td><td><input type="radio" name="rate_factor_美食丰富" value="3"></td><td><input type="radio" name="rate_factor_美食丰富" value="4"></td><td><input type="radio" name="rate_factor_美食丰富" value="5"></td></tr>
+                  <tr data-label="文化内容"><th class="scale-item">文化内容</th><td><input type="radio" name="rate_factor_文化内容" value="1"></td><td><input type="radio" name="rate_factor_文化内容" value="2"></td><td><input type="radio" name="rate_factor_文化内容" value="3"></td><td><input type="radio" name="rate_factor_文化内容" value="4"></td><td><input type="radio" name="rate_factor_文化内容" value="5"></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="scale-help"><span>1 完全不重要</span><span>3 中等重要</span><span>5 非常重要</span></div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>重要性排序</legend>
+        <p class="section-intro">把最影响旅游地点选择的因素拖到前面，导出的 CSV 会保留完整排序。</p>
+        <div class="form-group">
+          <span class="group-label required">选择旅游地点时最看重什么</span>
+          <ul class="priority-list" id="priorityList">
+            <li class="priority-item" draggable="true" data-value="安全便利"><span class="priority-rank">1</span><span>安全便利</span><span class="priority-grip">::</span></li>
+            <li class="priority-item" draggable="true" data-value="预算可控"><span class="priority-rank">2</span><span>预算可控</span><span class="priority-grip">::</span></li>
+            <li class="priority-item" draggable="true" data-value="交通少折腾"><span class="priority-rank">3</span><span>交通少折腾</span><span class="priority-grip">::</span></li>
+            <li class="priority-item" draggable="true" data-value="住宿舒适"><span class="priority-rank">4</span><span>住宿舒适</span><span class="priority-grip">::</span></li>
+            <li class="priority-item" draggable="true" data-value="自然风景"><span class="priority-rank">5</span><span>自然风景</span><span class="priority-grip">::</span></li>
+            <li class="priority-item" draggable="true" data-value="文化内容"><span class="priority-rank">6</span><span>文化内容</span><span class="priority-grip">::</span></li>
+            <li class="priority-item" draggable="true" data-value="美食丰富"><span class="priority-rank">7</span><span>美食丰富</span><span class="priority-grip">::</span></li>
+            <li class="priority-item" draggable="true" data-value="拍照出片"><span class="priority-rank">8</span><span>拍照出片</span><span class="priority-grip">::</span></li>
+            <li class="priority-item" draggable="true" data-value="自由活动"><span class="priority-rank">9</span><span>自由活动</span><span class="priority-grip">::</span></li>
+            <li class="priority-item" draggable="true" data-value="人少舒适"><span class="priority-rank">10</span><span>人少舒适</span><span class="priority-grip">::</span></li>
+          </ul>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>预算与交通住宿</legend>
+        <p class="section-intro">这些字段用于判断地点是否现实可行，避免推荐结果好看但不好执行。</p>
+        <div class="grid">
+          <div class="form-group">
+            <label class="required">人均预算</label>
+            <div class="options">
+              <label class="option"><input type="radio" name="budget" value="1000元以内"><span>1000元以内</span></label>
+              <label class="option"><input type="radio" name="budget" value="1000-3000元"><span>1000-3000元</span></label>
+              <label class="option"><input type="radio" name="budget" value="3000-6000元"><span>3000-6000元</span></label>
+              <label class="option"><input type="radio" name="budget" value="6000元以上"><span>6000元以上</span></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="required">交通偏好（多选）</label>
+            <div class="options">
+              <label class="option"><input type="checkbox" name="transport" value="高铁/动车"><span>高铁/动车</span></label>
+              <label class="option"><input type="checkbox" name="transport" value="飞机"><span>飞机</span></label>
+              <label class="option"><input type="checkbox" name="transport" value="自驾"><span>自驾</span></label>
+              <label class="option"><input type="checkbox" name="transport" value="包车/当地车"><span>包车/当地车</span></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="required">住宿偏好</label>
+            <div class="options">
+              <label class="option"><input type="radio" name="hotel" value="连锁酒店"><span>连锁酒店</span></label>
+              <label class="option"><input type="radio" name="hotel" value="特色民宿"><span>特色民宿</span></label>
+              <label class="option"><input type="radio" name="hotel" value="度假酒店"><span>度假酒店</span></label>
+              <label class="option"><input type="radio" name="hotel" value="营地/研学住宿"><span>营地/研学住宿</span></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="required">餐饮偏好（多选）</label>
+            <div class="options">
+              <label class="option"><input type="checkbox" name="food" value="当地小吃"><span>当地小吃</span></label>
+              <label class="option"><input type="checkbox" name="food" value="热门餐厅"><span>热门餐厅</span></label>
+              <label class="option"><input type="checkbox" name="food" value="清淡稳定"><span>清淡稳定</span></label>
+              <label class="option"><input type="checkbox" name="food" value="甜品饮品"><span>甜品饮品</span></label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>限制条件</legend>
+        <p class="section-intro">不适合的内容同样重要，可以帮助排除目的地和行程安排。</p>
+        <div class="grid">
+          <div class="form-group">
+            <label>不想安排的内容（多选）</label>
+            <div class="options">
+              <label class="option"><input type="checkbox" name="avoidItems" value="早起赶路"><span>早起赶路</span></label>
+              <label class="option"><input type="checkbox" name="avoidItems" value="长时间坐车"><span>长时间坐车</span></label>
+              <label class="option"><input type="checkbox" name="avoidItems" value="排队很久"><span>排队很久</span></label>
+              <label class="option"><input type="checkbox" name="avoidItems" value="高温暴晒"><span>高温暴晒</span></label>
+              <label class="option"><input type="checkbox" name="avoidItems" value="爬山徒步"><span>爬山徒步</span></label>
+              <label class="option"><input type="checkbox" name="avoidItems" value="太商业化"><span>太商业化</span></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>必须满足的条件（多选）</label>
+            <div class="options">
+              <label class="option"><input type="checkbox" name="mustHave" value="安全便利"><span>安全便利</span></label>
+              <label class="option"><input type="checkbox" name="mustHave" value="交通少折腾"><span>交通少折腾</span></label>
+              <label class="option"><input type="checkbox" name="mustHave" value="住宿舒适"><span>住宿舒适</span></label>
+              <label class="option"><input type="checkbox" name="mustHave" value="适合拍照"><span>适合拍照</span></label>
+              <label class="option"><input type="checkbox" name="mustHave" value="有文化内容"><span>有文化内容</span></label>
+              <label class="option"><input type="checkbox" name="mustHave" value="可自由活动"><span>可自由活动</span></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="specialNeeds">特殊需求或备注</label>
+            <textarea id="specialNeeds" name="specialNeeds" placeholder="例如：饮食忌口、晕车、证件限制、必须避开某些日期等。"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="otherIdeasInput">其他想法标签</label>
+            <div class="tag-box" id="otherIdeasBox">
+              <input id="otherIdeasInput" type="text" placeholder="输入后按回车，例如：想看日出、想住好一点">
+            </div>
+            <input id="otherIdeas" type="hidden">
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="actions">
+        <button class="btn" type="button" id="previewBtn">预览分析</button>
+        <button class="btn btn-primary" type="button" id="exportBtn">导出 CSV</button>
+      </div>
+    </form>
+
+    <section class="preview" id="previewSection" aria-live="polite">
+      <h2>预览与初步分析</h2>
+      <div class="analysis" id="analysisBox"></div>
+      <div id="previewContent"></div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    document.getElementById('fillDate').value = new Date().toISOString().slice(0, 10);
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove('show'), 2600);
+    }
+
+    function setupOptions() {
+      document.querySelectorAll('.option input').forEach((input) => {
+        const update = () => {
+          if (input.type === 'radio') {
+            document.querySelectorAll(`input[name="${input.name}"]`).forEach((peer) => {
+              peer.closest('.option').classList.toggle('checked', peer.checked);
+            });
+          } else {
+            input.closest('.option').classList.toggle('checked', input.checked);
+          }
+        };
+        input.addEventListener('change', update);
+        update();
+      });
+    }
+
+    function setupTagInput(inputId, boxId, hiddenId) {
+      const input = document.getElementById(inputId);
+      const box = document.getElementById(boxId);
+      const hidden = document.getElementById(hiddenId);
+      const tags = [];
+
+      function sync() {
+        hidden.value = tags.join('、');
+      }
+
+      function addTag(rawText) {
+        const text = rawText.trim();
+        if (!text || tags.includes(text)) return;
+        tags.push(text);
+        const tag = document.createElement('span');
+        tag.className = 'tag';
+        tag.textContent = text;
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.setAttribute('aria-label', `删除 ${text}`);
+        remove.textContent = '×';
+        remove.addEventListener('click', () => {
+          const index = tags.indexOf(text);
+          if (index >= 0) tags.splice(index, 1);
+          tag.remove();
+          sync();
+        });
+        tag.appendChild(remove);
+        box.insertBefore(tag, input);
+        sync();
+      }
+
+      input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          addTag(input.value);
+          input.value = '';
+        }
+        if (event.key === 'Backspace' && input.value === '' && tags.length) {
+          tags.pop();
+          const tagNodes = box.querySelectorAll('.tag');
+          if (tagNodes.length) tagNodes[tagNodes.length - 1].remove();
+          sync();
+        }
+      });
+
+      input.addEventListener('blur', () => {
+        if (input.value.trim()) {
+          addTag(input.value);
+          input.value = '';
+        }
+      });
+    }
+
+    function getChecked(name) {
+      return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`))
+        .map((input) => input.value)
+        .join('、');
+    }
+
+    function getValue(id) {
+      return document.getElementById(id).value.trim();
+    }
+
+    function getScaleData(groupName, columnPrefix) {
+      const data = {};
+      document.querySelectorAll(`[data-scale-group="${groupName}"] tbody tr`).forEach((row) => {
+        const label = row.dataset.label;
+        const checked = row.querySelector('input:checked');
+        data[`${columnPrefix}-${label}`] = checked ? checked.value : '';
+      });
+      return data;
+    }
+
+    function getScaleMissing(groupName) {
+      return Array.from(document.querySelectorAll(`[data-scale-group="${groupName}"] tbody tr`))
+        .filter((row) => !row.querySelector('input:checked'))
+        .map((row) => row.dataset.label);
+    }
+
+    function getTopRated(data, prefix) {
+      return Object.entries(data)
+        .filter(([key, value]) => key.startsWith(prefix) && Number(value) >= 4)
+        .sort((a, b) => Number(b[1]) - Number(a[1]))
+        .map(([key, value]) => `${key.replace(prefix, '')}(${value})`)
+        .join('、');
+    }
+
+    function getPriorityOrder() {
+      return Array.from(document.querySelectorAll('#priorityList .priority-item'))
+        .map((item) => item.dataset.value)
+        .join(' > ');
+    }
+
+    function setupPrioritySort() {
+      const list = document.getElementById('priorityList');
+      let draggingItem = null;
+
+      function updateRanks() {
+        list.querySelectorAll('.priority-item').forEach((item, index) => {
+          item.querySelector('.priority-rank').textContent = index + 1;
+        });
+      }
+
+      list.querySelectorAll('.priority-item').forEach((item) => {
+        item.addEventListener('dragstart', () => {
+          draggingItem = item;
+          item.classList.add('dragging');
+        });
+
+        item.addEventListener('dragend', () => {
+          item.classList.remove('dragging');
+          draggingItem = null;
+          updateRanks();
+        });
+      });
+
+      list.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        const afterElement = Array.from(list.querySelectorAll('.priority-item:not(.dragging)')).find((item) => {
+          const box = item.getBoundingClientRect();
+          return event.clientY < box.top + box.height / 2;
+        });
+        if (!draggingItem) return;
+        if (afterElement) list.insertBefore(draggingItem, afterElement);
+        else list.appendChild(draggingItem);
+      });
+
+      updateRanks();
+    }
+
+    function includesAny(text, words) {
+      return words.some((word) => text.includes(word));
+    }
+
+    function analyze(data) {
+      const types = data['目的地类型'];
+      const activities = data['活动偏好'];
+      const climate = data['气候偏好'];
+      const pace = data['旅行节奏'];
+      const budget = data['人均预算'];
+      const avoid = data['不想安排'];
+      const topDestinations = data['高分目的地类型'];
+      const topActivities = data['高分活动兴趣'];
+      const priorityTop3 = data['重要性排序'].split(' > ').slice(0, 3).join('、');
+
+      const themes = [];
+      const placeHints = [];
+
+      if (includesAny(types + activities + topDestinations + topActivities, ['海滨海岛', '水上项目', '休闲放松'])) {
+        themes.push('海滨度假');
+        placeHints.push('沿海城市、海岛、湾区度假目的地');
+      }
+      if (includesAny(types + activities + topDestinations + topActivities, ['山水自然', '森林湖泊', '自然风光', '户外运动'])) {
+        themes.push('自然避暑');
+        placeHints.push('山水城市、湖区、森林公园周边');
+      }
+      if (includesAny(types + activities + topDestinations + topActivities, ['古城古镇', '人文历史', '博物馆展览', '高校/研学城市', '研学城市'])) {
+        themes.push('人文研学');
+        placeHints.push('历史文化名城、高校集中城市、博物馆资源丰富的城市');
+      }
+      if (includesAny(types + activities + topDestinations + topActivities, ['现代都市', '购物逛街', '美食探店', '演出/音乐节'])) {
+        themes.push('都市体验');
+        placeHints.push('交通便利的一二线城市、商圈和演出资源丰富的城市');
+      }
+      if ((types + topDestinations).includes('主题乐园')) {
+        themes.push('乐园轻旅行');
+        placeHints.push('主题乐园周边、配套酒店成熟的城市');
+      }
+      if (!themes.length) {
+        themes.push('综合轻旅行');
+        placeHints.push('交通方便、住宿稳定、活动选择多的城市');
+      }
+
+      const constraints = [];
+      if (climate === '凉爽避暑' || avoid.includes('高温暴晒')) constraints.push('优先避暑和室内/阴凉活动');
+      if (pace === '轻松度假') constraints.push('减少跨城和早出晚归');
+      if (pace === '高密度打卡') constraints.push('选择景点集中、公共交通便利的区域');
+      if (budget === '1000元以内') constraints.push('优先周边短途和高铁可达地点');
+      if (budget === '1000-3000元') constraints.push('适合3-5天国内中短途');
+      if (priorityTop3) constraints.push(`优先满足：${priorityTop3}`);
+
+      return {
+        '推荐主题': Array.from(new Set(themes)).join('、'),
+        '地点方向': Array.from(new Set(placeHints)).join('、'),
+        '规划提醒': constraints.length ? constraints.join('、') : '先按兴趣主题筛选，再比较交通、住宿和天气'
+      };
+    }
+
+    function collectData() {
+      const scaleData = {
+        ...getScaleData('destinationRatings', '目的地评分'),
+        ...getScaleData('activityRatings', '活动评分'),
+        ...getScaleData('factorRatings', '要素评分')
+      };
+      const base = {
+        '填写日期': getValue('fillDate'),
+        '填写人昵称': getValue('name'),
+        '同行方式': getChecked('companions'),
+        '计划天数': getChecked('duration'),
+        '目的地类型': getChecked('destinationTypes'),
+        '气候偏好': getChecked('climate'),
+        '人流接受度': getChecked('crowd'),
+        '特别想去的地方': getValue('wantedPlaces'),
+        '活动偏好': getChecked('activities'),
+        '旅行节奏': getChecked('pace'),
+        '体力强度': getChecked('physicalLevel'),
+        '人均预算': getChecked('budget'),
+        '交通偏好': getChecked('transport'),
+        '住宿偏好': getChecked('hotel'),
+        '餐饮偏好': getChecked('food'),
+        '不想安排': getChecked('avoidItems'),
+        '必须满足': getChecked('mustHave'),
+        '特殊需求或备注': getValue('specialNeeds'),
+        '其他想法标签': getValue('otherIdeas'),
+        ...scaleData,
+        '高分目的地类型': getTopRated(scaleData, '目的地评分-'),
+        '高分活动兴趣': getTopRated(scaleData, '活动评分-'),
+        '高分行程要素': getTopRated(scaleData, '要素评分-'),
+        '重要性排序': getPriorityOrder()
+      };
+      return { ...base, ...analyze(base) };
+    }
+
+    function validateData(data) {
+      const required = [
+        ['填写人昵称', '请填写昵称'],
+        ['同行方式', '请选择同行方式'],
+        ['计划天数', '请选择计划天数'],
+        ['目的地类型', '请至少选择一个目的地类型'],
+        ['气候偏好', '请选择气候偏好'],
+        ['人流接受度', '请选择人流接受度'],
+        ['活动偏好', '请至少选择一个活动偏好'],
+        ['旅行节奏', '请选择旅行节奏'],
+        ['体力强度', '请选择体力强度'],
+        ['人均预算', '请选择人均预算'],
+        ['交通偏好', '请至少选择一种交通方式'],
+        ['住宿偏好', '请选择住宿偏好'],
+        ['餐饮偏好', '请至少选择一种餐饮偏好']
+      ];
+      for (const [field, message] of required) {
+        if (!data[field]) {
+          showToast(message);
+          return false;
+        }
+      }
+      const missingScales = [
+        ...getScaleMissing('destinationRatings').map((item) => `目的地评分：${item}`),
+        ...getScaleMissing('activityRatings').map((item) => `活动评分：${item}`),
+        ...getScaleMissing('factorRatings').map((item) => `要素评分：${item}`)
+      ];
+      if (missingScales.length) {
+        showToast(`请完成量表：${missingScales[0]}`);
+        return false;
+      }
+      return true;
+    }
+
+    function escapeHtml(text) {
+      return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function renderPreview() {
+      const data = collectData();
+      const analysis = analyze(data);
+      const analysisBox = document.getElementById('analysisBox');
+      analysisBox.innerHTML = `
+        <div><b>推荐主题：</b>${escapeHtml(analysis['推荐主题'])}</div>
+        <div><b>地点方向：</b>${escapeHtml(analysis['地点方向'])}</div>
+        <div><b>规划提醒：</b>${escapeHtml(analysis['规划提醒'])}</div>
+        <div><b>排序前三：</b>${escapeHtml(data['重要性排序'].split(' > ').slice(0, 3).join('、'))}</div>
+      `;
+
+      const rows = Object.entries(data).map(([key, value]) => (
+        `<tr><th>${escapeHtml(key)}</th><td>${escapeHtml(value || '-')}</td></tr>`
+      )).join('');
+      document.getElementById('previewContent').innerHTML = `<table class="preview-table">${rows}</table>`;
+      document.getElementById('previewSection').classList.add('show');
+      document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function csvCell(value) {
+      const text = String(value || '');
+      return `"${text.replace(/"/g, '""')}"`;
+    }
+
+    function exportCsv() {
+      const data = collectData();
+      if (!validateData(data)) return;
+      const headers = Object.keys(data).map(csvCell).join(',');
+      const values = Object.values(data).map(csvCell).join(',');
+      const csv = `\uFEFF${headers}\n${values}\n`;
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const safeName = (data['填写人昵称'] || '暑期旅游').replace(/[\\/:*?"<>|]/g, '_');
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${safeName}_暑期旅游兴趣点_${data['填写日期']}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      showToast('CSV 已导出');
+    }
+
+    setupOptions();
+    setupPrioritySort();
+    setupTagInput('wantedPlacesInput', 'wantedPlacesBox', 'wantedPlaces');
+    setupTagInput('otherIdeasInput', 'otherIdeasBox', 'otherIdeas');
+    document.getElementById('previewBtn').addEventListener('click', renderPreview);
+    document.getElementById('exportBtn').addEventListener('click', exportCsv);
+  </script>
+</body>
+</html>
