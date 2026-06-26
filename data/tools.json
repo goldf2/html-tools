@@ -52,6 +52,23 @@
       "miniProgramPath": "/pages/tools/summer-travel-interest/index"
     },
     {
+      "id": "chore-wheel-assigner",
+      "title": "家务抽奖大转盘",
+      "href": "tools/家务抽奖大转盘.html",
+      "description": "粘贴人员和家务两列表格，用转盘动画随机生成家务分配结果。",
+      "category": "生活工具",
+      "badge": "Random Assign",
+      "order": 35,
+      "tags": ["家务", "抽奖", "分配", "表格"],
+      "version": "1.0.0",
+      "kind": "static-html",
+      "platforms": {
+        "web": true,
+        "miniProgram": true
+      },
+      "miniProgramPath": "/pages/tools/chore-wheel-assigner/index"
+    },
+    {
       "id": "markdown-html-renderer",
       "title": "Markdown HTML Renderer",
       "href": "tools/markdown-html-renderer.html",

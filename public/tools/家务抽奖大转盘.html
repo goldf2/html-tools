@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>家务抽奖大转盘</title>
+  <script src="/site-nav.js?v=1.0.3" defer></script>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --text: #20242c;
+      --muted: #667085;
+      --line: #d9dee8;
+      --blue: #2563eb;
+      --green: #15803d;
+      --red: #dc2626;
+      --amber: #b45309;
+      --soft: #f8fafc;
+      --focus: rgba(37, 99, 235, 0.14);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      letter-spacing: 0;
+    }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .page-head,
+    main {
+      width: min(1120px, calc(100% - 36px));
+      margin: 0 auto;
+    }
+
+    .page-head {
+      padding: 18px 0 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.25;
+    }
+
+    .subtitle {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    main {
+      padding: 18px 0 42px;
+      display: grid;
+      grid-template-columns: minmax(320px, 0.92fr) minmax(360px, 1.08fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .panel-head {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.3;
+    }
+
+    .panel-body {
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 236px;
+      resize: vertical;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    textarea:focus,
+    input:focus {
+      outline: none;
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px var(--focus);
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    button {
+      min-height: 36px;
+      padding: 7px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: #bfdbfe;
+      background: #eff6ff;
+      color: var(--blue);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.62;
+    }
+
+    .primary {
+      border-color: var(--blue);
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .primary:hover {
+      background: #1d4ed8;
+      color: #fff;
+    }
+
+    .hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .badge {
+      display: inline-flex;
+      min-height: 24px;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #f3f4f6;
+      color: #4b5563;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .wheel-wrap {
+      display: grid;
+      gap: 14px;
+      justify-items: center;
+    }
+
+    .wheel-stage {
+      position: relative;
+      width: min(420px, 100%);
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      filter: drop-shadow(0 16px 30px rgba(15, 23, 42, 0.14));
+    }
+
+    .pointer {
+      position: absolute;
+      top: -2px;
+      left: 50%;
+      width: 0;
+      height: 0;
+      transform: translateX(-50%);
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-top: 0;
+      border-bottom: 26px solid var(--red);
+      z-index: 2;
+    }
+
+    .wheel-center {
+      position: absolute;
+      width: 78px;
+      height: 78px;
+      border: 7px solid #fff;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--blue);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 850;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+    }
+
+    .status {
+      min-height: 22px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .result-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .result-table th,
+    .result-table td {
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .result-table th {
+      background: var(--soft);
+      color: #344054;
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .result-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .empty {
+      padding: 18px;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .warning {
+      color: var(--amber);
+    }
+
+    @media (max-width: 860px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .page-head,
+      main {
+        width: min(100% - 24px, 1120px);
+      }
+
+      .panel-head {
+        display: grid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="page-head">
+      <h1>家务抽奖大转盘</h1>
+      <p class="subtitle">粘贴两列表格：第一列人员，第二列家务。点击开始后随机生成分配结果。</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <div class="panel-head">
+        <h2>输入表格</h2>
+        <span class="badge" id="inputMode">两列数据</span>
+      </div>
+      <div class="panel-body">
+        <textarea id="sourceInput" spellcheck="false">张三	洗碗
+李四	拖地
+王五	倒垃圾
+赵六	擦桌子</textarea>
+        <div class="toolbar">
+          <button class="primary" id="startBtn" type="button">开始分配</button>
+          <button id="sampleBtn" type="button">载入示例</button>
+          <button id="clearBtn" type="button">清空</button>
+          <button id="copyBtn" type="button">复制结果</button>
+        </div>
+        <p class="hint">支持从 Excel、Numbers、飞书表格或普通文本粘贴。系统会分别读取第一列人员和第二列家务，再随机匹配。</p>
+        <div class="stats">
+          <span class="badge" id="peopleCount">人员 0</span>
+          <span class="badge" id="choreCount">家务 0</span>
+          <span class="badge" id="pairCount">可分配 0</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>抽奖结果</h2>
+        <span class="badge" id="roundBadge">未开始</span>
+      </div>
+      <div class="panel-body">
+        <div class="wheel-wrap">
+          <div class="wheel-stage">
+            <div class="pointer" aria-hidden="true"></div>
+            <canvas id="wheel" width="720" height="720" aria-label="抽奖大转盘"></canvas>
+            <div class="wheel-center">START</div>
+          </div>
+          <div class="status" id="statusText">等待输入表格。</div>
+        </div>
+        <div id="resultArea" class="empty">点击开始后显示人员与家务分配结果。</div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const sourceInput = document.querySelector('#sourceInput');
+    const startBtn = document.querySelector('#startBtn');
+    const sampleBtn = document.querySelector('#sampleBtn');
+    const clearBtn = document.querySelector('#clearBtn');
+    const copyBtn = document.querySelector('#copyBtn');
+    const peopleCount = document.querySelector('#peopleCount');
+    const choreCount = document.querySelector('#choreCount');
+    const pairCount = document.querySelector('#pairCount');
+    const statusText = document.querySelector('#statusText');
+    const resultArea = document.querySelector('#resultArea');
+    const roundBadge = document.querySelector('#roundBadge');
+    const canvas = document.querySelector('#wheel');
+    const ctx = canvas.getContext('2d');
+
+    const sampleText = `张三\t洗碗
+李四\t拖地
+王五\t倒垃圾
+赵六\t擦桌子
+钱七\t整理客厅
+孙八\t晾衣服`;
+
+    const colors = ['#2563eb', '#0f766e', '#b45309', '#be3455', '#4338ca', '#15803d', '#0e7490', '#7c3aed'];
+    let currentRotation = 0;
+    let lastAssignments = [];
+
+    function splitRow(row) {
+      if (row.includes('\t')) return row.split('\t');
+      if (row.includes(',')) return row.split(',');
+      if (row.includes('，')) return row.split('，');
+      return row.split(/\s{2,}/);
+    }
+
+    function unique(values) {
+      const seen = new Set();
+      return values.filter((value) => {
+        const key = value.trim();
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
+
+    function parseInput() {
+      const rows = sourceInput.value
+        .split(/\r?\n/)
+        .map((row) => splitRow(row).map((cell) => cell.trim()))
+        .filter((row) => row.some(Boolean));
+
+      const people = unique(rows.map((row) => row[0] || '').filter(Boolean));
+      const chores = unique(rows.map((row) => row[1] || '').filter(Boolean));
+
+      return { people, chores };
+    }
+
+    function shuffle(items) {
+      const next = [...items];
+      for (let i = next.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [next[i], next[j]] = [next[j], next[i]];
+      }
+      return next;
+    }
+
+    function makeAssignments(people, chores) {
+      const shuffledPeople = shuffle(people);
+      const shuffledChores = shuffle(chores);
+      const count = Math.min(shuffledPeople.length, shuffledChores.length);
+      const assignments = [];
+
+      for (let i = 0; i < count; i += 1) {
+        assignments.push({
+          person: shuffledPeople[i],
+          chore: shuffledChores[i],
+        });
+      }
+
+      return {
+        assignments,
+        unassignedPeople: shuffledPeople.slice(count),
+        unassignedChores: shuffledChores.slice(count),
+      };
+    }
+
+    function drawWheel(labels, rotation = currentRotation) {
+      const width = canvas.width;
+      const center = width / 2;
+      const radius = center - 18;
+      ctx.clearRect(0, 0, width, width);
+
+      const safeLabels = labels.length ? labels : ['等待输入'];
+      const slice = Math.PI * 2 / safeLabels.length;
+
+      safeLabels.forEach((label, index) => {
+        const start = rotation + index * slice - Math.PI / 2;
+        const end = start + slice;
+        ctx.beginPath();
+        ctx.moveTo(center, center);
+        ctx.arc(center, center, radius, start, end);
+        ctx.closePath();
+        ctx.fillStyle = colors[index % colors.length];
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(center, center);
+        ctx.rotate(start + slice / 2);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '700 28px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+        const text = label.length > 8 ? `${label.slice(0, 8)}…` : label;
+        ctx.fillText(text, radius - 28, 10);
+        ctx.restore();
+      });
+
+      ctx.beginPath();
+      ctx.arc(center, center, radius, 0, Math.PI * 2);
+      ctx.lineWidth = 8;
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+    }
+
+    function renderStats() {
+      const { people, chores } = parseInput();
+      peopleCount.textContent = `人员 ${people.length}`;
+      choreCount.textContent = `家务 ${chores.length}`;
+      pairCount.textContent = `可分配 ${Math.min(people.length, chores.length)}`;
+      drawWheel(people.length ? people : chores);
+    }
+
+    function escapeHtml(text) {
+      return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function renderResult(result) {
+      lastAssignments = result.assignments;
+      if (!result.assignments.length) {
+        resultArea.className = 'empty warning';
+        resultArea.textContent = '至少需要 1 名人员和 1 项家务。';
+        return;
+      }
+
+      const rows = result.assignments.map((item, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${escapeHtml(item.person)}</td>
+          <td>${escapeHtml(item.chore)}</td>
+        </tr>
+      `).join('');
+
+      const notes = [];
+      if (result.unassignedPeople.length) notes.push(`未分配人员：${result.unassignedPeople.join('、')}`);
+      if (result.unassignedChores.length) notes.push(`未分配家务：${result.unassignedChores.join('、')}`);
+
+      resultArea.className = 'table-wrap';
+      resultArea.innerHTML = `
+        <table class="result-table">
+          <thead>
+            <tr><th>#</th><th>人员</th><th>家务</th></tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+        ${notes.length ? `<p class="hint warning" style="padding:10px;margin:0;">${escapeHtml(notes.join('；'))}</p>` : ''}
+      `;
+    }
+
+    function spinAndAssign() {
+      const { people, chores } = parseInput();
+      if (!people.length || !chores.length) {
+        statusText.textContent = '请至少输入 1 名人员和 1 项家务。';
+        renderResult({ assignments: [], unassignedPeople: people, unassignedChores: chores });
+        return;
+      }
+
+      startBtn.disabled = true;
+      roundBadge.textContent = '抽奖中';
+      statusText.textContent = '转盘正在随机分配…';
+
+      const labels = people.length ? people : chores;
+      const start = performance.now();
+      const duration = 2600;
+      const from = currentRotation;
+      const to = from + Math.PI * 2 * (5 + Math.random() * 3) + Math.random() * Math.PI * 2;
+
+      function animate(now) {
+        const progress = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        currentRotation = from + (to - from) * eased;
+        drawWheel(labels, currentRotation);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+          return;
+        }
+
+        const result = makeAssignments(people, chores);
+        renderResult(result);
+        roundBadge.textContent = '已完成';
+        statusText.textContent = `已生成 ${result.assignments.length} 组分配结果。`;
+        startBtn.disabled = false;
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    function copyResult() {
+      if (!lastAssignments.length) {
+        statusText.textContent = '暂无可复制的结果。';
+        return;
+      }
+      const text = ['人员\t家务', ...lastAssignments.map((item) => `${item.person}\t${item.chore}`)].join('\n');
+      navigator.clipboard.writeText(text)
+        .then(() => { statusText.textContent = '结果已复制。'; })
+        .catch(() => { statusText.textContent = '复制失败，可手动选中结果复制。'; });
+    }
+
+    sourceInput.addEventListener('input', renderStats);
+    startBtn.addEventListener('click', spinAndAssign);
+    sampleBtn.addEventListener('click', () => {
+      sourceInput.value = sampleText;
+      renderStats();
+      statusText.textContent = '已载入示例。';
+    });
+    clearBtn.addEventListener('click', () => {
+      sourceInput.value = '';
+      lastAssignments = [];
+      resultArea.className = 'empty';
+      resultArea.textContent = '点击开始后显示人员与家务分配结果。';
+      roundBadge.textContent = '未开始';
+      statusText.textContent = '等待输入表格。';
+      renderStats();
+    });
+    copyBtn.addEventListener('click', copyResult);
+
+    renderStats();
+  </script>
+</body>
+</html>
