@@ -11,6 +11,7 @@ export interface ToolItem {
   order?: number;
   tags?: string[];
   hidden?: boolean;
+  version?: string;
   kind?: 'static-html' | 'questionnaire' | 'renderer';
   platforms?: {
     web?: boolean;
@@ -76,6 +77,7 @@ function normalizeCatalogTool(tool: Partial<ToolItem>, index: number): ToolItem 
     order: tool.order || (index + 1) * 10,
     tags: Array.isArray(tool.tags) ? tool.tags : [],
     hidden: Boolean(tool.hidden),
+    version: tool.version || '1.0.0',
     kind: tool.kind || 'static-html',
     platforms: {
       web: tool.platforms?.web ?? true,

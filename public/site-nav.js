@@ -1,7 +1,7 @@
 (function () {
   if (document.querySelector('.site-nav')) return;
 
-  var APP_VERSION = '1.0.1';
+  var APP_VERSION = '1.0.2';
 
   function absoluteHref(href) {
     return href && href.charAt(0) === '/' ? href : '/' + href;
@@ -48,6 +48,13 @@
     return categories.map(function (category) {
       return '<a class="site-nav__link" href="' + escapeHtml(categoryHref(category)) + '">' + escapeHtml(category) + '</a>';
     }).join('');
+  }
+
+  function currentToolFrom(tools) {
+    var currentPath = decodeURI(window.location.pathname);
+    return visibleTools(tools).find(function (tool) {
+      return decodeURI(absoluteHref(tool.href || '')) === currentPath;
+    });
   }
 
   var style = document.createElement('style');
@@ -100,22 +107,29 @@
   setNavContent('');
 
   document.body.insertBefore(nav, document.body.firstChild);
-  appendToolVersionFooter();
 
   fetch('/api/tools', { cache: 'no-store' })
     .then(function (response) { return response.json(); })
-    .then(function (data) { setNavContent(renderCategories(data.tools)); })
-    .catch(function () { setNavContent(''); });
+    .then(function (data) {
+      setNavContent(renderCategories(data.tools));
+      appendToolVersionFooter(currentToolFrom(data.tools));
+    })
+    .catch(function () {
+      setNavContent('');
+      appendToolVersionFooter(null);
+    });
 
-  function appendToolVersionFooter() {
+  function appendToolVersionFooter(tool) {
     if (window.location.pathname.indexOf('/tools/') !== 0) return;
     if (document.querySelector('.tool-version-footer')) return;
 
+    var title = tool && tool.title ? tool.title : document.title || 'Tool';
+    var version = tool && tool.version ? tool.version : APP_VERSION;
     var footer = document.createElement('footer');
     footer.className = 'tool-version-footer';
     footer.innerHTML = [
       '<div class="tool-version-footer__inner">',
-      '<span>HTML Tools v' + escapeHtml(APP_VERSION) + '</span>',
+      '<span>' + escapeHtml(title) + ' v' + escapeHtml(version) + '</span>',
       '<span>&copy; ' + new Date().getFullYear() + ' EBM001. All rights reserved.</span>',
       '</div>'
     ].join('');
