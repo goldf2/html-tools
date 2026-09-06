@@ -69,6 +69,22 @@
       "miniProgramPath": "/pages/tools/chore-wheel-assigner/index"
     },
     {
+      "id": "goose-peng-bike",
+      "title": "鹅鹏骑自行车",
+      "href": "tools/鹅鹏骑自行车.html",
+      "description": "用 SVG 绘制鹅鹏骑自行车的 2D 循环动画，可暂停、调速并重置。",
+      "category": "互动动画",
+      "badge": "SVG 2D",
+      "order": 45,
+      "tags": ["svg", "动画", "自行车", "插画"],
+      "version": "1.0.0",
+      "kind": "static-html",
+      "platforms": {
+        "web": true,
+        "miniProgram": false
+      }
+    },
+    {
       "id": "markdown-html-renderer",
       "title": "Markdown HTML Renderer",
       "href": "tools/markdown-html-renderer.html",
