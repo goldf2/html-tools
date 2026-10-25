@@ -137,26 +137,107 @@
     }
     @media (max-height: 360px) { .app { min-height: 360px; } }
     @media (prefers-reduced-motion: reduce) { button:active { transform: none; } }
+
+    /* Manuscript library: persistent sidebar on tablets, drawer on narrow screens. */
+    .app-header > div { min-width: 0; }
+    .current-script-row { align-items: center; }
+    .current-script { flex: 1; min-width: 0; }
+    .current-script-caption { display: block; margin-bottom: 4px; color: var(--muted); font-size: 11px; }
+    .current-script-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; font-size: 14px; line-height: 1.5; font-weight: 600; }
+    .current-script-row .edit-toggle { display: block; align-self: center; }
+    .list-toggle { flex: 0 0 auto; font-size: 14px; }
+    .workspace { gap: 12px; }
+    .library-pane { display: none; flex-direction: column; gap: 12px; min-width: 0; min-height: 0; padding: 14px; background: var(--panel); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+    .list-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex: 0 0 auto; }
+    .list-heading h2 { font-size: 15px; }
+    .list-count { color: var(--muted); font-size: 12px; font-weight: 400; margin-left: 5px; }
+    .list-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex: 0 0 auto; }
+    .list-actions button { padding-left: 7px; padding-right: 7px; font-size: 13px; }
+    .script-list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: #3c5550 transparent; }
+    .script-list ul { list-style: none; margin: 0; padding: 0; }
+    .script-list li + li { margin-top: 7px; }
+    .script-item { display: flex; gap: 10px; width: 100%; padding: 12px 10px; border-color: transparent; background: transparent; text-align: left; border-radius: 11px; min-height: 64px; }
+    .script-item[aria-current="true"] { background: #25463e; border-color: #6cbdab; }
+    .script-number { flex: 0 0 23px; color: #91ada5; font-size: 12px; line-height: 1.7; padding-top: 1px; font-variant-numeric: tabular-nums; }
+    .script-item[aria-current="true"] .script-number { color: var(--accent); }
+    .script-item-body { min-width: 0; flex: 1; }
+    .script-item-title { display: block; color: var(--text); font-size: 14px; line-height: 1.65; overflow-wrap: anywhere; }
+    .script-item-type { display: block; color: var(--muted); font-size: 11px; margin-top: 4px; }
+    .library-footer { display: flex; flex-direction: column; gap: 8px; flex: 0 0 auto; }
+    .library-footer p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .list-close { font-size: 13px; }
+    .list-backdrop { display: none; position: fixed; z-index: 20; inset: 0; width: 100%; height: 100%; border: 0; border-radius: 0; background: rgba(0, 0, 0, .65); padding: 0; }
+    .list-backdrop:hover { background: rgba(0, 0, 0, .65); }
+    .list-open .list-backdrop { display: block; }
+    .list-open .library-pane { display: flex; position: fixed; z-index: 21; top: max(8px, env(safe-area-inset-top)); bottom: max(8px, env(safe-area-inset-bottom)); left: max(8px, env(safe-area-inset-left)); width: min(340px, calc(100vw - 32px)); box-shadow: 10px 0 50px rgba(0, 0, 0, .35); }
+    .editor-overlay { position: fixed; z-index: 40; inset: 0; display: flex; align-items: center; justify-content: center; padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); background: rgba(0, 0, 0, .72); }
+    .editor-modal { display: flex; flex-direction: column; gap: 12px; width: min(760px, 100%); height: min(780px, 100%); max-height: 100%; min-width: 0; min-height: 0; padding: 18px; overflow: auto; overscroll-behavior: contain; border: 1px solid #4a645d; border-radius: 18px; background: var(--panel); box-shadow: 0 20px 80px rgba(0, 0, 0, .45); }
+    .title-field { display: flex; flex-direction: column; gap: 7px; flex: 0 0 auto; }
+    .title-field label { color: var(--muted); font-size: 12px; }
+    .title-field input { min-width: 0; width: 100%; min-height: 46px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 11px; background: #101b1b; color: var(--text); font-size: 16px; line-height: 1.5; }
+    .editor-modal .editor-copy { min-height: 120px; }
+    .editor-modal .editor-heading button { flex: 0 0 auto; }
+    .editor-modal .editor-footer { flex: 0 0 auto; }
+    .editor-modal .editor-note { flex: 0 0 auto; }
+    .editor-close { display: block; }
+    .editor-open .preview, .editor-open .library-pane { pointer-events: none; }
+    input[type="range"] { height: 44px; }
+    summary { min-height: 44px; }
+    .app.focus .library-pane, .app.focus .list-backdrop { display: none !important; }
+    @media (min-width: 701px) {
+      .workspace { display: grid; grid-template-columns: clamp(210px, 25vw, 280px) minmax(0, 1fr); }
+      .library-pane, .list-open .library-pane { display: flex; position: static; width: auto; box-shadow: none; }
+      .list-toggle, .list-close, .list-backdrop, .list-open .list-backdrop { display: none; }
+      .current-script-caption { font-size: 12px; }
+      .current-script-title { font-size: 16px; -webkit-line-clamp: 1; }
+      .current-script-row .edit-toggle { display: block; }
+      .reading-copy { padding-left: clamp(25px, 4vw, 58px); padding-right: clamp(25px, 4vw, 58px); }
+      .playback-row { gap: 6px; padding-left: 10px; padding-right: 10px; }
+      .playback-row button { padding-left: 9px; padding-right: 9px; }
+      .secondary-controls { gap: 6px; }
+      .icon-label { font-size: 12px; }
+      .app.focus .workspace { display: flex; }
+    }
+    @media (max-width: 420px) {
+      .current-script-row { gap: 7px; }
+      .list-toggle { font-size: 13px; padding-left: 9px; padding-right: 9px; }
+      .current-script-title { font-size: 13px; }
+      .current-script-caption { margin-bottom: 1px; }
+      .editor-modal { padding: 14px; }
+    }
+    @media (max-height: 520px) {
+      .current-script-caption { display: none; }
+      .current-script-title { -webkit-line-clamp: 1; }
+      .list-heading { min-height: 32px; }
+      .library-pane { gap: 7px; padding-top: 10px; padding-bottom: 10px; }
+      .library-footer p { display: none; }
+      .editor-modal { gap: 8px; padding: 12px; }
+      .editor-modal .editor-copy { min-height: 90px; }
+      .editor-modal textarea { min-height: 64px; }
+      .editor-modal .editor-note { display: none; }
+      .editor-modal .editor-heading h2 { font-size: 14px; }
+    }
   </style>
 </head>
 <body>
   <div class="app" id="app">
     <header class="app-header">
-      <div><h1>口播提词器 <span style="font-size:11px;color:var(--muted);font-weight:400">v1.0.0</span></h1><p class="subtitle">选好文稿，按自己的节奏开口</p></div>
+      <div><h1>口播提词器 <span style="font-size:11px;color:var(--muted);font-weight:400">v1.1.0</span></h1><p class="subtitle">选好文稿，按自己的节奏开口</p></div>
       <span class="save-state" id="saveState" role="status">正在读取本地文稿</span>
     </header>
-    <div class="library-row">
-      <div class="library-field"><label for="scriptSelect">文稿库</label><select id="scriptSelect" aria-label="选择口播文稿"></select></div>
-      <button type="button" class="edit-toggle" id="editToggle" aria-controls="editorPane" aria-expanded="false">编辑文稿</button>
+    <div class="library-row current-script-row" id="currentScriptRow">
+      <button type="button" class="list-toggle" id="listToggle" aria-controls="libraryPane" aria-expanded="false">文稿列表</button>
+      <div class="current-script"><span class="current-script-caption">当前文稿</span><strong class="current-script-title" id="currentTitle"></strong></div>
+      <button type="button" class="edit-toggle" id="editToggle" aria-controls="editorPane" aria-expanded="false">编辑</button>
     </div>
     <main class="workspace">
-      <section class="editor-pane" id="editorPane" aria-labelledby="editorTitle">
-        <div class="editor-heading"><h2 id="editorTitle">编辑文稿</h2><button type="button" id="editorClose" class="small editor-close">完成</button></div>
-        <div class="editor-tools"><button type="button" id="importButton" class="small quiet">导入 TXT</button><button type="button" id="customButton" class="small quiet">自定义文稿</button><input type="file" id="fileInput" accept=".txt,text/plain" hidden></div>
-        <div class="editor-copy"><label for="scriptEditor">可直接修改，或粘贴自己的口播内容</label><textarea id="scriptEditor" spellcheck="false" placeholder="把要说的话粘贴在这里……"></textarea></div>
-        <div class="editor-footer"><span id="wordCount">0 字</span><span>修改后从开头提词</span></div>
-        <p class="editor-note">文稿和设置保存在当前浏览器。清理浏览器数据后可能丢失，请另行保留原稿。</p>
-      </section>
+      <button type="button" class="list-backdrop" id="listBackdrop" aria-label="关闭文稿列表" tabindex="-1"></button>
+      <aside class="library-pane" id="libraryPane" aria-labelledby="libraryTitle">
+        <div class="list-heading"><h2 id="libraryTitle">文稿列表<span class="list-count" id="scriptCount"></span></h2><button type="button" class="quiet small list-close" id="listClose">关闭</button></div>
+        <div class="list-actions"><button type="button" class="primary" id="addScriptButton">＋ 新增文稿</button><button type="button" class="quiet" id="importButton">导入 TXT</button><input type="file" id="fileInput" accept=".txt,text/plain" hidden></div>
+        <nav class="script-list" id="scriptList" aria-label="口播文稿"><ul id="scriptListItems"></ul></nav>
+        <div class="library-footer"><button type="button" class="quiet small" id="editCurrentButton">编辑当前文稿</button><p>点击标题切换，文稿和设置自动保存在当前浏览器。</p></div>
+      </aside>
       <section class="preview" aria-label="提词播放区">
         <div class="preview-toolbar"><span class="preview-label">提词区 · 滑动可暂停并调整位置</span><span class="state-label" id="stateLabel">准备就绪</span></div>
         <div class="stage" id="stage">
@@ -183,6 +264,15 @@
         </div>
       </section>
     </main>
+    <section class="editor-overlay" id="editorPane" role="dialog" aria-modal="true" aria-labelledby="editorTitle" hidden>
+      <div class="editor-modal">
+        <div class="editor-heading"><h2 id="editorTitle">编辑文稿</h2><button type="button" id="editorClose" class="small primary editor-close">完成，回到提词</button></div>
+        <div class="title-field"><label for="scriptTitle">文稿标题</label><input id="scriptTitle" type="text" autocomplete="off" placeholder="为这篇文稿起个标题"></div>
+        <div class="editor-copy"><label for="scriptEditor">正文 · 可直接修改或粘贴内容</label><textarea id="scriptEditor" spellcheck="false" placeholder="把要说的话粘贴在这里……"></textarea></div>
+        <div class="editor-footer"><span id="wordCount">0 字</span><span id="editorSaveState">输入后自动保存</span></div>
+        <p class="editor-note">文稿仅保存在当前浏览器。清理浏览器数据后可能丢失，请另行保留原稿。</p>
+      </div>
+    </section>
   </div>
   <script>
     window.SCRIPT_LIBRARY = /* SCRIPT_LIBRARY */ [{"id": "yufeng-01", "title": "冷镦机突然停机，先说清这几件事", "category": "维修", "text": "冷镦机突然停机，联系维修时，先说清楚：设备是什么品牌型号，是启动不了，还是运行中停机？\n\n停机前有没有异响、报警或者动作异常？\n\n常熟宇峰机械承接多工位冷镦机维修。\n\n把所在地区、设备型号和故障表现发来，先了解情况，再沟通检查和维修安排。"}, {"id": "yufeng-02", "title": "买冷镦机配件，先把型号尺寸对准", "category": "配件", "text": "冷镦机配件损坏，找配件时，型号和尺寸一定要核对清楚。\n\n夹钳、衬套、凸轮等零件，名称相同，也要确认具体结构和安装位置。\n\n我们提供冷镦机相关配件供应，可以把设备型号、旧件照片和关键尺寸发来，先核对适配情况，再确认报价与货期。"}, {"id": "yufeng-03", "title": "老冷镦机精度下降，先评估维修范围", "category": "大修", "text": "老冷镦机加工尺寸不稳定，先结合产品缺陷、模具工艺和设备状态检查，再判断需要局部维修，还是进一步拆检大修。\n\n常熟宇峰机械承接多工位冷镦机大修，根据检查结果沟通修复、更换和调试项目。\n\n有需要的，把机型、使用情况和主要问题发来。"}, {"id": "yufeng-04", "title": "冷镦机出故障，能不能上门修？", "category": "维修", "text": "冷镦机出了故障，能不能在客户现场处理，要看故障部位、维修项目和现场条件。\n\n我们提供冷镦机上门维修服务；涉及进一步拆检、加工或其他处理的项目，再沟通具体安排。\n\n需要上门检查的，先提供所在地区、设备型号和故障现象，便于确认服务安排。"}, {"id": "yufeng-05", "title": "老冷镦机值不值得大修，怎么看？", "category": "大修", "text": "一台老冷镦机值不值得大修，要把主要部件状态、今后加工的产品、维修费用和停机时间放在一起考虑。\n\n有的适合局部修复，有的需要较全面的大修，具体要检查后判断。\n\n把设备型号、使用情况和目前的问题发来，我们结合实际情况讨论检修方案。"}, {"id": "yufeng-06", "title": "冷镦机大修，拆开后主要看什么？", "category": "大修", "text": "冷镦机大修，拆检阶段要把相关部件的磨损、损伤和配合情况查清楚，再确定哪些需要修复、哪些需要更换，以及后续装配和调试项目。\n\n看维修过程，可以重点看检查发现、处理依据和试机记录，这些更能说明一台设备具体做了哪些维修。"}, {"id": "yufeng-07", "title": "冷镦机夹料不稳，先查动作配合", "category": "维修", "text": "多工位冷镦机夹料不稳、交接掉料，可能涉及夹钳磨损、安装位置或相关机构的动作配合，需要结合机型和故障出现的位置检查。\n\n我们承接冷镦机相关故障排查。\n\n咨询时说明在哪一工位、什么情况下出现问题，便于进一步沟通。"}, {"id": "yufeng-08", "title": "同一配件反复坏，原因要查清楚", "category": "维修", "text": "冷镦机同一个配件反复损坏，除了更换零件，还要结合损坏位置和使用情况，检查适配、安装、润滑及相关机构状态。\n\n把旧件照片、设备型号，以及每次损坏前后的表现整理好，有助于确定排查方向。\n\n维修和配件需求都可以联系常熟宇峰机械。"}, {"id": "yufeng-09", "title": "冷镦机修完，怎么确认维修结果？", "category": "大修", "text": "冷镦机维修后，要根据本次维修内容，检查相关功能、动作配合和试机表现；涉及产品质量的项目，再结合约定的试样要求确认。\n\n维修前把验收项目沟通清楚，维修后逐项核对。\n\n有设备检修需求，可以先把具体问题发来讨论。"}, {"id": "yufeng-10", "title": "冷镦机维修报价，要确认哪些项目？", "category": "维修", "text": "沟通冷镦机维修报价时，可以把检修哪些部位、需要哪些配件、是否涉及加工，以及上门、运输和调试费用分别确认。\n\n这样才方便判断报价对应的工作范围。\n\n需要了解维修费用的，先提供设备型号、故障表现和所在地区，再结合具体项目沟通。"}, {"id": "yufeng-11", "title": "冷镦机小修和大修，怎么区分？", "category": "大修", "text": "冷镦机小修，通常针对局部故障；大修涉及更全面的检查、修复、装配和调试。\n\n维修范围要根据设备实际状况确定，局部问题也可能通过小修解决。\n\n需要判断自己的设备适合哪种处理方式，可以把机型、故障表现和以往维修情况发来。"}, {"id": "yufeng-12", "title": "配件没有型号，怎么找适配件？", "category": "配件", "text": "冷镦机配件没有型号，可以先整理设备铭牌、零件安装位置、旧件多角度照片和关键尺寸；有图纸或原采购记录，也可以一起提供。\n\n我们根据资料核对结构与规格，再确认是否能够供应。\n\n找配件时，资料越清楚，越方便核对具体需求。"}, {"id": "yufeng-13", "title": "老冷镦机想改造，先评估这几项", "category": "改造", "text": "老冷镦机准备改造，先看设备结构和状态，再明确想解决什么问题：送料、操作，还是现有产品的加工适配。\n\n目标清楚，才方便讨论改哪些部位、投入多少、需要多久。\n\n我们承接冷镦机改造评估，可以把设备型号、现有问题和改造目标发来。"}, {"id": "yufeng-14", "title": "接了非标件订单，现有设备能做吗？", "category": "改造", "text": "接到非标件订单，先把产品图纸、材料要求和现有冷镦机参数核对清楚，再评估加工条件及可能需要的调整。\n\n能实施的项目，再讨论具体改造方案、费用和周期。\n\n需要评估的，可以私信提供设备型号与产品资料，先把加工要求沟通清楚。"}, {"id": "yufeng-15", "title": "想提高产能，先找设备卡在哪一环", "category": "改造", "text": "想改善冷镦机生产效率，先看看时间主要耗在哪里：是故障停机多、送料交接不顺，还是换模调试时间长？\n\n把影响生产的具体环节找出来，再评估维修、调整或改造的必要性。\n\n咨询时，可以说明当前产品、运行情况和主要问题，先讨论可改善的方向。"}, {"id": "yufeng-16", "title": "冷镦机维修要多久，取决于哪些项目？", "category": "维修", "text": "冷镦机维修周期，要结合检修项目判断。\n\n处理局部故障，和涉及拆检、零件加工、重新装配，所需时间会有差别，还要考虑配件供应和作业条件。\n\n安排检修前，把设备情况和计划停机时间说明白，检查后再确认项目与周期，方便工厂安排生产。"}, {"id": "yufeng-17", "title": "修冷镦机，先把维修范围说清楚", "category": "维修", "text": "安排冷镦机维修前，建议把这次要解决的故障、检查范围、拟处理项目和需要确认的事项沟通清楚。\n\n拆检过程中如果发现其他问题，再讨论是否增加维修内容。\n\n常熟宇峰机械承接冷镦机维修与大修，具体项目根据设备情况沟通确认。"}, {"id": "yufeng-18", "title": "故障时有时无，报修时怎么描述？", "category": "维修", "text": "冷镦机故障时有时无，报修时可以说明：开机多久出现、加工什么产品时出现、发生频率怎样，以及近期换过或调整过哪些部位。\n\n有已有的报警记录、照片或视频，也可以一起提供。\n\n这些资料能帮助维修人员了解情况，确定后续检查方向。"}, {"id": "yufeng-19", "title": "闲置冷镦机重新启用，先安排检查", "category": "维修", "text": "长期闲置的冷镦机准备重新投入生产，先结合停放时间、保存状态和原有故障，确定需要检查的项目。\n\n涉及润滑、电气、相关机构状态和试机的内容，按设备实际情况安排。\n\n厂里有闲置设备准备重新启用，可以把型号、照片和已知问题发来沟通。"}, {"id": "yufeng-20", "title": "多台冷镦机要检修，怎么分批安排？", "category": "大修", "text": "工厂有多台冷镦机需要检修，可以先整理每台设备的故障、生产任务和可停机时间，再结合配件与维修项目分批安排。\n\n常熟宇峰机械承接冷镦机维修和大修。\n\n需要集中安排检修的，可以先提供设备清单、主要问题和计划时间，沟通检查及实施顺序。"}];
@@ -190,25 +280,28 @@
   <script>
   (() => {
     "use strict";
-    const STORAGE_KEY = "yufeng.teleprompter.v1";
-    const CUSTOM_ID = "__custom__";
+    const STORAGE_KEY = "yufeng.teleprompter.v2";
+    const LEGACY_STORAGE_KEY = "yufeng.teleprompter.v1";
+    const LEGACY_CUSTOM_ID = "__custom__";
     const $ = id => document.getElementById(id);
-    const ui = { app: $("app"), select: $("scriptSelect"), editor: $("scriptEditor"), pane: $("editorPane"), editToggle: $("editToggle"), copy: $("readingCopy"), viewport: $("scrollViewport"), stage: $("stage"), play: $("playButton"), state: $("stateLabel"), status: $("statusMessage"), save: $("saveState"), progress: $("readingProgress"), progressText: $("progressText"), countdown: $("countdown"), count: $("countdownNumber"), file: $("fileInput"), focus: $("focusButton"), fullscreen: $("fullscreenButton") };
+    const ui = { app: $("app"), editor: $("scriptEditor"), title: $("scriptTitle"), pane: $("editorPane"), editToggle: $("editToggle"), libraryPane: $("libraryPane"), listToggle: $("listToggle"), list: $("scriptListItems"), currentTitle: $("currentTitle"), preview: document.querySelector(".preview"), copy: $("readingCopy"), viewport: $("scrollViewport"), stage: $("stage"), play: $("playButton"), state: $("stateLabel"), status: $("statusMessage"), save: $("saveState"), progress: $("readingProgress"), progressText: $("progressText"), countdown: $("countdown"), count: $("countdownNumber"), file: $("fileInput"), focus: $("focusButton"), fullscreen: $("fullscreenButton") };
     const defaults = { fontSize: 44, speed: 32, lineHeight: 1.8, mirror: false, countdown: true, readingLine: true };
     const library = [];
     const knownIds = new Set();
     for (const [index, item] of (Array.isArray(window.SCRIPT_LIBRARY) ? window.SCRIPT_LIBRARY : []).entries()) {
       if (!item || typeof item !== "object") continue;
       let id = String(item.id ?? "script-" + (index + 1));
-      if (id === CUSTOM_ID || knownIds.has(id)) id = "script-" + (index + 1) + "-" + id;
+      while (id === LEGACY_CUSTOM_ID || knownIds.has(id)) id = "script-" + (index + 1) + "-" + id;
       const value = item.text ?? item.content ?? item.body;
       if (typeof value !== "string") continue;
       knownIds.add(id);
       library.push({ id, title: String(item.title ?? "文稿 " + (index + 1)), text: value });
     }
     let settings = { ...defaults };
-    let selectedId = library[0]?.id || CUSTOM_ID;
+    let selectedId = library[0]?.id || "";
     let drafts = Object.create(null);
+    let titles = Object.create(null);
+    let customScripts = [];
     let storageAvailable = true;
     let saveTimer = 0;
     let running = false;
@@ -223,36 +316,67 @@
     let focused = false;
     let hadFullscreen = false;
     let resizeFrame = 0;
-
+    let editorOpen = false;
+    let listOpen = false;
+    const narrowLayout = window.matchMedia("(max-width: 700px)");
     const clamp = (value, min, max, fallback) => Number.isFinite(Number(value)) ? Math.min(max, Math.max(min, Number(value))) : fallback;
+    const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
+    const displayTitle = title => title.trim() || "未命名文稿";
+    function scriptById(id) {
+      const builtIn = library.find(item => item.id === id);
+      if (builtIn) return { id, title: hasOwn(titles, id) ? titles[id] : builtIn.title, text: hasOwn(drafts, id) ? drafts[id] : builtIn.text, custom: false };
+      const custom = customScripts.find(item => item.id === id);
+      return custom ? { ...custom, custom: true } : null;
+    }
+    function uniqueId(preferred) {
+      let id = preferred || "user-" + (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10));
+      while (id === LEGACY_CUSTOM_ID || knownIds.has(id) || customScripts.some(item => item.id === id)) id = "user-" + id + "-" + Math.random().toString(36).slice(2, 7);
+      return id;
+    }
     function readStorage() {
       try {
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+        const current = localStorage.getItem(STORAGE_KEY);
+        const saved = JSON.parse((current === null ? localStorage.getItem(LEGACY_STORAGE_KEY) : current) || "null");
         if (!saved || typeof saved !== "object") return;
-        if (saved.drafts && typeof saved.drafts === "object") {
-          for (const [id, text] of Object.entries(saved.drafts)) if (typeof text === "string") drafts[id] = text;
+        if (saved.drafts && typeof saved.drafts === "object") for (const [id, text] of Object.entries(saved.drafts)) if (typeof text === "string") drafts[id] = text;
+        if (saved.titles && typeof saved.titles === "object") for (const [id, title] of Object.entries(saved.titles)) if (typeof title === "string") titles[id] = title;
+        if (Array.isArray(saved.customScripts)) {
+          for (const item of saved.customScripts) {
+            if (!item || typeof item !== "object" || typeof item.text !== "string") continue;
+            const id = uniqueId(typeof item.id === "string" && item.id ? item.id : undefined);
+            customScripts.push({ id, title: typeof item.title === "string" ? item.title : "未命名文稿", text: item.text });
+          }
         }
-        if (saved.selectedId === CUSTOM_ID || knownIds.has(saved.selectedId)) selectedId = saved.selectedId;
+        let restoredId = saved.selectedId;
+        if ((Number(saved.version) < 2 || !Array.isArray(saved.customScripts)) && typeof drafts[LEGACY_CUSTOM_ID] === "string" && drafts[LEGACY_CUSTOM_ID].trim()) {
+          const id = uniqueId("user-legacy-custom");
+          customScripts.push({ id, title: "自定义文稿", text: drafts[LEGACY_CUSTOM_ID] });
+          if (restoredId === LEGACY_CUSTOM_ID) restoredId = id;
+        }
+        if (scriptById(restoredId)) selectedId = restoredId;
+        else if (!scriptById(selectedId)) selectedId = customScripts[0]?.id || library[0]?.id || "";
         const s = saved.settings || {};
         settings = { fontSize: Math.round(clamp(s.fontSize, 24, 96, defaults.fontSize)), speed: Math.round(clamp(s.speed, 10, 100, defaults.speed)), lineHeight: Math.round(clamp(s.lineHeight, 1.4, 2.4, defaults.lineHeight) * 10) / 10, mirror: typeof s.mirror === "boolean" ? s.mirror : defaults.mirror, countdown: typeof s.countdown === "boolean" ? s.countdown : defaults.countdown, readingLine: typeof s.readingLine === "boolean" ? s.readingLine : defaults.readingLine };
       } catch (_) { storageAvailable = false; }
     }
     function saveNow() {
       clearTimeout(saveTimer);
-      drafts[selectedId] = ui.editor.value;
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, selectedId, drafts, settings }));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 2, selectedId, drafts, titles, customScripts, settings }));
         storageAvailable = true;
         ui.save.textContent = "已保存到本机";
+        $("editorSaveState").textContent = "已自动保存到本机";
       } catch (_) {
         storageAvailable = false;
         ui.save.textContent = "仅本次使用";
+        $("editorSaveState").textContent = "无法本地保存，仅本次使用";
       }
       ui.save.classList.toggle("unavailable", !storageAvailable);
     }
     function queueSave() {
       clearTimeout(saveTimer);
       ui.save.textContent = storageAvailable ? "正在保存…" : "仅本次使用";
+      $("editorSaveState").textContent = storageAvailable ? "正在自动保存…" : "无法本地保存，仅本次使用";
       saveTimer = setTimeout(saveNow, 250);
     }
     function message(text) { ui.status.textContent = text; }
@@ -268,10 +392,43 @@
       ui.play.setAttribute("aria-label", running ? "暂停提词" : counting ? "取消倒计时" : finished ? "从头重播" : "开始提词");
       ui.play.setAttribute("aria-pressed", String(running || counting));
     }
+    function renderList() {
+      ui.list.replaceChildren();
+      const allScripts = [...library.map(item => scriptById(item.id)), ...customScripts.map(item => scriptById(item.id))];
+      allScripts.forEach((item, index) => {
+        const li = document.createElement("li");
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "script-item";
+        button.dataset.scriptId = item.id;
+        button.setAttribute("aria-current", String(item.id === selectedId));
+        const number = document.createElement("span");
+        number.className = "script-number";
+        number.textContent = String(index + 1).padStart(2, "0");
+        const body = document.createElement("span");
+        body.className = "script-item-body";
+        const title = document.createElement("span");
+        title.className = "script-item-title";
+        title.textContent = displayTitle(item.title);
+        body.appendChild(title);
+        if (item.custom) {
+          const type = document.createElement("span");
+          type.className = "script-item-type";
+          type.textContent = "自建文稿";
+          body.appendChild(type);
+        }
+        button.append(number, body);
+        button.addEventListener("click", () => loadScript(item.id));
+        li.appendChild(button);
+        ui.list.appendChild(li);
+      });
+      $("scriptCount").textContent = allScripts.length + " 篇";
+    }
     function renderText() {
       const text = ui.editor.value;
-      ui.copy.textContent = text || "先选择一篇文稿，\n或打开编辑区粘贴内容。";
+      ui.copy.textContent = text || "打开文稿列表，\n选择一篇文稿，或新增自己的内容。";
       ui.copy.classList.toggle("empty", !text.trim());
+      ui.currentTitle.textContent = displayTitle(ui.title.value);
       $("wordCount").textContent = Array.from(text.replace(/\s/g, "")).length + " 字";
     }
     function resetPosition() {
@@ -282,24 +439,79 @@
       updatePlayButton();
       updateProgress();
     }
+    function setListOpen(open, restoreFocus = true) {
+      listOpen = Boolean(open && narrowLayout.matches);
+      if (listOpen) pause("已暂停，选择文稿后从开头提词。");
+      ui.app.classList.toggle("list-open", listOpen);
+      ui.listToggle.setAttribute("aria-expanded", String(listOpen));
+      ui.preview.inert = listOpen || editorOpen;
+      if (listOpen) {
+        ui.libraryPane.setAttribute("role", "dialog");
+        ui.libraryPane.setAttribute("aria-modal", "true");
+        const active = ui.list.querySelector('[aria-current="true"]');
+        (active || $("addScriptButton")).focus();
+        if (active) active.scrollIntoView({ block: "nearest" });
+      } else {
+        ui.libraryPane.removeAttribute("role");
+        ui.libraryPane.removeAttribute("aria-modal");
+        if (restoreFocus && narrowLayout.matches && !editorOpen) ui.listToggle.focus();
+      }
+    }
     function setEditorOpen(open, moveFocus = false) {
-      if (open) pause("已暂停，编辑完成后可重新开始。");
-      ui.app.classList.toggle("editor-open", open);
-      ui.editToggle.setAttribute("aria-expanded", String(open));
-      ui.editToggle.textContent = open ? "收起编辑" : "编辑文稿";
-      if (moveFocus && open) ui.editor.focus();
+      if (open) {
+        pause("已暂停，编辑完成后从开头提词。");
+        resetPosition();
+        if (focused) setFocusMode(false);
+        setListOpen(false, false);
+      }
+      const wasOpen = editorOpen;
+      editorOpen = Boolean(open);
+      ui.pane.hidden = !editorOpen;
+      ui.app.classList.toggle("editor-open", editorOpen);
+      ui.editToggle.setAttribute("aria-expanded", String(editorOpen));
+      ui.preview.inert = editorOpen || listOpen;
+      ui.libraryPane.inert = editorOpen;
+      $("currentScriptRow").inert = editorOpen;
+      if (editorOpen && (moveFocus || !wasOpen)) ui.title.focus();
+      if (!editorOpen && wasOpen) { ui.title.blur(); ui.editor.blur(); saveNow(); ui.editToggle.focus(); scheduleLayout(); }
     }
     function loadScript(id) {
+      const item = scriptById(id);
+      if (!item) return;
+      const restoreListFocus = ui.list.contains(document.activeElement);
       pause();
-      drafts[selectedId] = ui.editor.value;
-      selectedId = id === CUSTOM_ID || knownIds.has(id) ? id : CUSTOM_ID;
-      ui.select.value = selectedId;
-      const original = library.find(item => item.id === selectedId);
-      ui.editor.value = Object.prototype.hasOwnProperty.call(drafts, selectedId) ? drafts[selectedId] : original?.text || "";
+      if (editorOpen) setEditorOpen(false);
+      selectedId = item.id;
+      ui.title.value = item.title;
+      ui.editor.value = item.text;
       renderText();
+      renderList();
+      resetPosition();
+      setListOpen(false);
+      if (restoreListFocus && !narrowLayout.matches) {
+        const active = ui.list.querySelector('[aria-current="true"]');
+        if (active) active.focus({ preventScroll: true });
+      }
+      queueSave();
+      message("已切换文稿，点击“开始”提词。");
+    }
+    function addScript(title, text = "", selectTitle = false) {
+      const id = uniqueId();
+      customScripts.push({ id, title, text });
+      loadScript(id);
+      setEditorOpen(true, true);
+      if (selectTitle) ui.title.select();
+      saveNow();
+    }
+    function updateDraft() {
+      const custom = customScripts.find(item => item.id === selectedId);
+      if (custom) { custom.title = ui.title.value; custom.text = ui.editor.value; }
+      else if (knownIds.has(selectedId)) { titles[selectedId] = ui.title.value; drafts[selectedId] = ui.editor.value; }
+      pause();
+      renderText();
+      renderList();
       resetPosition();
       queueSave();
-      message("已切换文稿。修改和切换文稿会回到开头。");
     }
     function applySettings() {
       document.documentElement.style.setProperty("--font-size", settings.fontSize + "px");
@@ -406,7 +618,7 @@
     function togglePlayback() { if (running || counting) pause("已暂停，点击“开始”继续。"); else start(); }
     function setFocusMode(value) {
       focused = value;
-      if (value) setEditorOpen(false);
+      if (value) { setEditorOpen(false); setListOpen(false, false); }
       ui.app.classList.toggle("focus", value);
       ui.focus.textContent = value ? "退出专注" : "专注";
       ui.focus.setAttribute("aria-pressed", String(value));
@@ -449,35 +661,28 @@
     }
 
     readStorage();
-    library.forEach((item, index) => {
-      const option = document.createElement("option");
-      option.value = item.id;
-      option.textContent = String(index + 1).padStart(2, "0") + " · " + item.title;
-      ui.select.appendChild(option);
-    });
-    const customOption = document.createElement("option");
-    customOption.value = CUSTOM_ID;
-    customOption.textContent = "自定义文稿";
-    ui.select.appendChild(customOption);
-    ui.select.value = selectedId;
-    const initialScript = library.find(item => item.id === selectedId);
-    ui.editor.value = Object.prototype.hasOwnProperty.call(drafts, selectedId) ? drafts[selectedId] : initialScript?.text || "";
+    const initialScript = scriptById(selectedId);
+    ui.title.value = initialScript?.title || "";
+    ui.editor.value = initialScript?.text || "";
     renderText();
+    renderList();
     applySettings();
     resetPosition();
     saveNow();
     scheduleLayout();
 
-    ui.select.addEventListener("change", () => loadScript(ui.select.value));
-    ui.editToggle.addEventListener("click", () => setEditorOpen(!ui.app.classList.contains("editor-open")));
-    $("editorClose").addEventListener("click", () => { ui.editor.blur(); setEditorOpen(false); ui.editToggle.focus(); });
-    $("customButton").addEventListener("click", () => { loadScript(CUSTOM_ID); ui.editor.focus(); });
-    ui.editor.addEventListener("input", () => {
-      pause();
-      renderText();
-      resetPosition();
-      queueSave();
+    ui.listToggle.addEventListener("click", () => setListOpen(!listOpen));
+    $("listClose").addEventListener("click", () => setListOpen(false));
+    $("listBackdrop").addEventListener("click", () => setListOpen(false));
+    ui.editToggle.addEventListener("click", () => {
+      if (!scriptById(selectedId)) addScript("新文稿 " + (customScripts.length + 1), "", true);
+      else setEditorOpen(true, true);
     });
+    $("editCurrentButton").addEventListener("click", () => ui.editToggle.click());
+    $("editorClose").addEventListener("click", () => setEditorOpen(false));
+    $("addScriptButton").addEventListener("click", () => addScript("新文稿 " + (customScripts.length + 1), "", true));
+    ui.editor.addEventListener("input", updateDraft);
+    ui.title.addEventListener("input", updateDraft);
     $("importButton").addEventListener("click", () => { pause(); ui.file.click(); });
     ui.file.addEventListener("change", async () => {
       const file = ui.file.files && ui.file.files[0];
@@ -485,19 +690,9 @@
       if (file.size > 2 * 1024 * 1024) { message("这份文稿较大，请导入 2 MB 以内的 UTF-8 TXT 文件。"); ui.file.value = ""; return; }
       try {
         const text = typeof file.text === "function" ? await file.text() : await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result || "")); reader.onerror = reject; reader.readAsText(file, "UTF-8"); });
-        const imported = String(text).replace(/^\uFEFF/, "");
-        const currentCustom = selectedId === CUSTOM_ID ? ui.editor.value : drafts[CUSTOM_ID] || "";
-        if (currentCustom.trim() && currentCustom !== imported && !window.confirm("导入会替换已有的自定义文稿，是否继续？")) {
-          message("已取消导入，保留原自定义文稿。");
-          ui.file.value = "";
-          return;
-        }
-        loadScript(CUSTOM_ID);
-        ui.editor.value = imported;
-        renderText();
-        resetPosition();
-        queueSave();
-        message("已导入“" + file.name + "”。如有乱码，请将原文件另存为 UTF-8 后重试。");
+        const title = file.name.replace(/\.txt$/i, "").trim() || "导入文稿";
+        addScript(title, String(text).replace(/^\uFEFF/, ""));
+        message("已作为新文稿导入“" + file.name + "”。如有乱码，请将原文件另存为 UTF-8 后重试。");
       } catch (_) { message("读取失败，请重新选择 UTF-8 编码的 TXT 文件。"); }
       ui.file.value = "";
     });
@@ -524,8 +719,22 @@
     ui.viewport.addEventListener("wheel", manualPause, { passive: true });
     ui.viewport.addEventListener("keydown", event => { if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End"].includes(event.key)) manualPause(); });
     document.addEventListener("keydown", event => {
-      if (event.key === "Escape") { if (ui.app.classList.contains("editor-open")) setEditorOpen(false); else if (focused && !fullscreenElement()) setFocusMode(false); return; }
-      if (event.code !== "Space" || event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
+      const modal = editorOpen ? ui.pane : listOpen ? ui.libraryPane : null;
+      if (event.key === "Escape") {
+        if (editorOpen) { event.preventDefault(); setEditorOpen(false); }
+        else if (listOpen) { event.preventDefault(); setListOpen(false); }
+        else if (focused && !fullscreenElement()) setFocusMode(false);
+        return;
+      }
+      if (event.key === "Tab" && modal) {
+        const elements = Array.from(modal.querySelectorAll('button:not([disabled]), input:not([type="file"]):not([disabled]), textarea:not([disabled]), [tabindex="0"]')).filter(element => element.getClientRects().length > 0);
+        const first = elements[0];
+        const last = elements[elements.length - 1];
+        if (event.shiftKey && (document.activeElement === first || !modal.contains(document.activeElement))) { event.preventDefault(); if (last) last.focus(); }
+        else if (!event.shiftKey && (document.activeElement === last || !modal.contains(document.activeElement))) { event.preventDefault(); if (first) first.focus(); }
+        return;
+      }
+      if (modal || event.code !== "Space" || event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
       const target = event.target;
       if (target instanceof HTMLElement && (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT", "BUTTON", "SUMMARY"].includes(target.tagName))) return;
       event.preventDefault();
@@ -533,7 +742,7 @@
     });
     document.addEventListener("visibilitychange", () => { if (document.hidden) { if (running || counting) pause("已暂停：切回页面后，点击“开始”继续。"); saveNow(); } });
     window.addEventListener("pagehide", () => { pause(); saveNow(); });
-    window.addEventListener("resize", scheduleLayout, { passive: true });
+    window.addEventListener("resize", () => { if (!narrowLayout.matches && listOpen) setListOpen(false, false); scheduleLayout(); }, { passive: true });
     if (window.visualViewport) window.visualViewport.addEventListener("resize", scheduleLayout, { passive: true });
     if (typeof ResizeObserver === "function") new ResizeObserver(scheduleLayout).observe(ui.stage);
     document.addEventListener("fullscreenchange", fullscreenChanged);
