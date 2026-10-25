@@ -99,6 +99,27 @@
         "web": true,
         "miniProgram": false
       }
+    },
+    {
+      "id": "teleprompter",
+      "title": "口播提词器",
+      "href": "tools/teleprompter.html",
+      "description": "适配手机与 iPad，内置20条口播文稿，支持编辑、滚动、镜像与专注模式。",
+      "category": "创作工具",
+      "badge": "提词器",
+      "order": 5,
+      "tags": [
+        "提词",
+        "口播",
+        "手机",
+        "iPad"
+      ],
+      "version": "1.0.0",
+      "kind": "static-html",
+      "platforms": {
+        "web": true,
+        "miniProgram": false
+      }
     }
   ]
 }

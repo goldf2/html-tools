@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101919">
+  <meta name="description" content="适合手机与 iPad 的口播提词器，支持文稿编辑、TXT 导入、镜像与本地保存。">
+  <title>口播提词器 · HTML Tools</title>
+  <style>
+    :root { color-scheme: dark; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; --bg: #101919; --panel: #192525; --border: #334242; --muted: #a2b5b2; --text: #edf5f2; --accent: #74ddc5; --font-size: 44px; --line-height: 1.8; }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body { margin: 0; background: var(--bg); color: var(--text); }
+    button, input, select, textarea { font: inherit; }
+    button, select, input[type="file"] { min-height: 44px; }
+    button { border: 1px solid var(--border); border-radius: 12px; padding: 9px 14px; color: var(--text); background: #213131; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+    button:hover { background: #2b4140; }
+    button:active { transform: translateY(1px); }
+    button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-visible, summary:focus-visible, .scroll-viewport:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+    button.primary { color: #0b2a23; background: var(--accent); border-color: var(--accent); font-weight: 700; }
+    button.primary:hover { background: #93ead6; }
+    button.quiet { background: transparent; }
+    button.small { padding: 7px 12px; font-size: 14px; }
+    .app { width: 100%; max-width: 1480px; height: 100vh; height: 100dvh; margin: auto; padding: max(14px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); display: flex; flex-direction: column; gap: 12px; }
+    .app-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex: 0 0 auto; }
+    h1 { font-size: 21px; letter-spacing: .02em; margin: 0; font-weight: 700; }
+    .subtitle { color: var(--muted); font-size: 12px; margin: 5px 0 0; }
+    .save-state { max-width: 116px; font-size: 12px; line-height: 1.5; color: var(--muted); text-align: right; }
+    .save-state::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: var(--accent); vertical-align: 1px; }
+    .save-state.unavailable::before { background: #e8ba78; }
+    .library-row { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
+    .library-field { flex: 1; min-width: 0; position: relative; }
+    .library-field label { display: block; color: var(--muted); font-size: 12px; margin: 0 0 6px 2px; }
+    select { display: block; width: 100%; min-width: 0; color: var(--text); border: 1px solid var(--border); background: var(--panel); border-radius: 12px; padding: 10px 35px 10px 12px; font-size: 14px; text-overflow: ellipsis; }
+    .edit-toggle { align-self: end; flex: 0 0 auto; }
+    .workspace { position: relative; display: flex; flex: 1; min-height: 0; min-width: 0; gap: 16px; }
+    .editor-pane { display: none; position: absolute; z-index: 15; inset: 0; min-width: 0; min-height: 0; flex-direction: column; gap: 12px; padding: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 18px; overflow: auto; overscroll-behavior: contain; }
+    .editor-open .editor-pane { display: flex; }
+    .editor-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex: 0 0 auto; }
+    h2 { margin: 0; font-size: 16px; }
+    .editor-tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .editor-copy { display: flex; flex: 1; min-height: 130px; flex-direction: column; gap: 8px; }
+    .editor-copy label { color: var(--muted); font-size: 12px; }
+    textarea { resize: none; width: 100%; min-height: 100px; flex: 1; padding: 13px; border: 1px solid var(--border); border-radius: 12px; color: var(--text); background: #101b1b; font-size: 16px; line-height: 1.75; }
+    textarea::placeholder { color: #7f9892; }
+    .editor-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .editor-note { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .preview { display: flex; flex: 1; min-width: 0; min-height: 0; flex-direction: column; overflow: hidden; background: #0a1010; border: 1px solid var(--border); border-radius: 18px; }
+    .preview-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; flex: 0 0 auto; border-bottom: 1px solid #243131; }
+    .preview-label { font-size: 13px; color: var(--muted); }
+    .state-label { font-size: 12px; color: var(--accent); }
+    .stage { position: relative; flex: 1; min-height: 75px; overflow: hidden; background: #090f0f; }
+    .scroll-viewport { position: absolute; inset: 0; overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #3c5550 transparent; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y pinch-zoom; }
+    .reading-copy { margin: 0; padding: var(--lead-space, 90px) clamp(24px, 5vw, 80px) var(--tail-space, 150px); font-size: var(--font-size); line-height: var(--line-height); letter-spacing: .025em; font-weight: 500; white-space: pre-wrap; overflow-wrap: anywhere; color: #e9efeb; }
+    .reading-copy.mirrored { transform: scaleX(-1); }
+    .reading-copy.empty { color: #778b86; }
+    .reading-line { position: absolute; top: 30%; left: 0; right: 0; z-index: 2; height: 0; border-top: 1px solid rgba(116, 221, 197, .24); pointer-events: none; }
+    .reading-line::before { content: ""; position: absolute; left: 8px; top: -6px; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 7px solid var(--accent); }
+    .stage::before, .stage::after { content: ""; position: absolute; z-index: 3; left: 0; right: 0; height: 28px; pointer-events: none; }
+    .stage::before { top: 0; background: linear-gradient(#090f0f, transparent); }
+    .stage::after { bottom: 0; background: linear-gradient(transparent, #090f0f); }
+    .countdown { position: absolute; z-index: 5; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 6px; background: rgba(9, 15, 15, .88); pointer-events: none; }
+    .countdown-number { color: var(--accent); font-size: clamp(76px, 15vw, 150px); font-weight: 650; line-height: 1; font-variant-numeric: tabular-nums; }
+    .countdown-hint { font-size: 14px; color: var(--muted); }
+    .progress-row { display: flex; gap: 10px; align-items: center; flex: 0 0 auto; padding: 7px 16px 3px; }
+    progress { appearance: none; -webkit-appearance: none; border: none; height: 3px; min-width: 0; flex: 1; background: #253633; border-radius: 10px; overflow: hidden; }
+    progress::-webkit-progress-bar { background: #253633; border-radius: 10px; }
+    progress::-webkit-progress-value { background: var(--accent); border-radius: 10px; }
+    progress::-moz-progress-bar { background: var(--accent); border-radius: 10px; }
+    .progress-text { width: 38px; color: var(--muted); font-size: 11px; text-align: right; font-variant-numeric: tabular-nums; }
+    .playback-row { padding: 10px 12px; display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+    .play-button { flex: 1; min-width: 90px; }
+    .icon-label { font-size: 14px; white-space: nowrap; }
+    .secondary-controls { display: flex; gap: 8px; }
+    .settings { flex: 0 0 auto; padding: 10px 16px 12px; background: #142020; border-top: 1px solid #243737; }
+    .sliders { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .range-field { min-width: 0; }
+    .range-heading { display: flex; justify-content: space-between; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+    .range-heading output { color: var(--text); font-variant-numeric: tabular-nums; }
+    input[type="range"] { display: block; width: 100%; margin: 1px 0 -2px; height: 35px; padding: 0; accent-color: var(--accent); cursor: pointer; }
+    details { margin-top: 1px; }
+    summary { display: inline-flex; align-items: center; min-height: 36px; color: var(--muted); font-size: 12px; cursor: pointer; padding: 5px 0; }
+    summary::after { content: "＋"; padding-left: 6px; }
+    details[open] summary::after { content: "−"; }
+    .more-settings { display: grid; grid-template-columns: minmax(110px, 1fr) 1fr; gap: 8px 18px; padding: 0 0 4px; }
+    .switches { display: flex; align-items: center; flex-wrap: wrap; gap: 0 14px; grid-column: 1 / -1; }
+    .switch-label { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; color: var(--text); font-size: 13px; cursor: pointer; }
+    input[type="checkbox"] { width: 19px; height: 19px; margin: 0; accent-color: var(--accent); }
+    .line-range { grid-column: 1 / -1; }
+    .status { margin: 0; min-height: 18px; line-height: 1.5; color: var(--muted); font-size: 11px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+    .app.focus { max-width: none; gap: 0; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+    .app.focus .app-header, .app.focus .library-row, .app.focus .editor-pane, .app.focus .preview-toolbar, .app.focus .settings { display: none; }
+    .app.focus .workspace { display: flex; }
+    .app.focus .preview { border: 0; border-radius: 0; }
+    .app.focus .playback-row { padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); }
+    .app:fullscreen { background: var(--bg); }
+    .app:-webkit-full-screen { background: var(--bg); width: 100%; height: 100%; }
+    @media (min-width: 960px) {
+      .app { gap: 16px; padding-top: max(20px, env(safe-area-inset-top)); padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+      .workspace { display: grid; grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); }
+      .editor-pane { display: flex; position: static; }
+      .editor-close { display: none; }
+      .edit-toggle { display: none; }
+      .library-field { max-width: 610px; }
+      h1 { font-size: 24px; }
+      .subtitle { font-size: 13px; }
+      .preview-toolbar { padding-top: 14px; padding-bottom: 14px; }
+      .playback-row { padding: 12px 16px; }
+      .settings { padding-top: 13px; }
+      .reading-copy { padding-left: clamp(36px, 5vw, 80px); padding-right: clamp(36px, 5vw, 80px); }
+    }
+    @media (max-width: 420px) {
+      .app { padding-left: max(10px, env(safe-area-inset-left)); padding-right: max(10px, env(safe-area-inset-right)); gap: 10px; }
+      h1 { font-size: 19px; }
+      button { padding-left: 10px; padding-right: 10px; }
+      .playback-row { gap: 6px; padding-left: 8px; padding-right: 8px; }
+      .secondary-controls { gap: 6px; }
+      .icon-label { font-size: 12px; }
+      .settings { padding-left: 12px; padding-right: 12px; }
+      .sliders { gap: 14px; }
+      .reading-copy { padding-left: 25px; padding-right: 25px; }
+    }
+    @media (max-height: 520px) {
+      .app { gap: 7px; padding-top: max(7px, env(safe-area-inset-top)); padding-bottom: max(7px, env(safe-area-inset-bottom)); }
+      .subtitle, .library-field label, .preview-toolbar { display: none; }
+      .app-header { min-height: 24px; }
+      h1 { font-size: 17px; }
+      .library-row { max-height: 44px; }
+      .settings { padding-top: 3px; padding-bottom: 3px; }
+      details { display: none; }
+      .status { display: none; }
+      .playback-row { padding-top: 6px; padding-bottom: 6px; }
+      .progress-row { padding-top: 4px; padding-bottom: 0; }
+      .editor-pane { gap: 8px; padding: 12px; }
+      .editor-note { display: none; }
+    }
+    @media (max-height: 360px) { .app { min-height: 360px; } }
+    @media (prefers-reduced-motion: reduce) { button:active { transform: none; } }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="app-header">
+      <div><h1>口播提词器 <span style="font-size:11px;color:var(--muted);font-weight:400">v1.0.0</span></h1><p class="subtitle">选好文稿，按自己的节奏开口</p></div>
+      <span class="save-state" id="saveState" role="status">正在读取本地文稿</span>
+    </header>
+    <div class="library-row">
+      <div class="library-field"><label for="scriptSelect">文稿库</label><select id="scriptSelect" aria-label="选择口播文稿"></select></div>
+      <button type="button" class="edit-toggle" id="editToggle" aria-controls="editorPane" aria-expanded="false">编辑文稿</button>
+    </div>
+    <main class="workspace">
+      <section class="editor-pane" id="editorPane" aria-labelledby="editorTitle">
+        <div class="editor-heading"><h2 id="editorTitle">编辑文稿</h2><button type="button" id="editorClose" class="small editor-close">完成</button></div>
+        <div class="editor-tools"><button type="button" id="importButton" class="small quiet">导入 TXT</button><button type="button" id="customButton" class="small quiet">自定义文稿</button><input type="file" id="fileInput" accept=".txt,text/plain" hidden></div>
+        <div class="editor-copy"><label for="scriptEditor">可直接修改，或粘贴自己的口播内容</label><textarea id="scriptEditor" spellcheck="false" placeholder="把要说的话粘贴在这里……"></textarea></div>
+        <div class="editor-footer"><span id="wordCount">0 字</span><span>修改后从开头提词</span></div>
+        <p class="editor-note">文稿和设置保存在当前浏览器。清理浏览器数据后可能丢失，请另行保留原稿。</p>
+      </section>
+      <section class="preview" aria-label="提词播放区">
+        <div class="preview-toolbar"><span class="preview-label">提词区 · 滑动可暂停并调整位置</span><span class="state-label" id="stateLabel">准备就绪</span></div>
+        <div class="stage" id="stage">
+          <div class="scroll-viewport" id="scrollViewport" tabindex="0" aria-label="提词内容，可手动滚动"><p class="reading-copy" id="readingCopy"></p></div>
+          <div class="reading-line" id="readingLine" aria-hidden="true"></div>
+          <div class="countdown" id="countdown" hidden aria-live="polite"><span class="countdown-number" id="countdownNumber">3</span><span class="countdown-hint">准备开口</span></div>
+        </div>
+        <div class="progress-row"><progress id="readingProgress" value="0" max="100" aria-label="阅读进度"></progress><span class="progress-text" id="progressText">0%</span></div>
+        <div class="playback-row">
+          <button type="button" class="icon-label" id="resetButton" aria-label="回到文稿开头">回开头</button>
+          <button type="button" class="primary play-button" id="playButton" aria-label="开始提词">开始</button>
+          <div class="secondary-controls"><button type="button" class="icon-label quiet" id="focusButton" aria-pressed="false">专注</button><button type="button" class="icon-label quiet" id="fullscreenButton" aria-pressed="false">全屏</button></div>
+        </div>
+        <div class="settings">
+          <div class="sliders">
+            <div class="range-field"><div class="range-heading"><label for="fontSize">字号</label><output id="fontSizeOutput" for="fontSize">44</output></div><input type="range" id="fontSize" min="24" max="96" step="1" value="44"></div>
+            <div class="range-field"><div class="range-heading"><label for="scrollSpeed">滚动速度</label><output id="scrollSpeedOutput" for="scrollSpeed">32 px/s</output></div><input type="range" id="scrollSpeed" min="10" max="100" step="1" value="32"></div>
+          </div>
+          <details id="moreSettings"><summary>更多设置</summary><div class="more-settings">
+            <div class="range-field line-range"><div class="range-heading"><label for="lineHeight">行距</label><output id="lineHeightOutput" for="lineHeight">1.8 倍</output></div><input type="range" id="lineHeight" min="1.4" max="2.4" step="0.1" value="1.8"></div>
+            <div class="switches"><label class="switch-label"><input type="checkbox" id="mirrorToggle">左右镜像</label><label class="switch-label"><input type="checkbox" id="countdownToggle" checked>3 秒倒计时</label><label class="switch-label"><input type="checkbox" id="lineToggle" checked>阅读指示线</label></div>
+          </div></details>
+          <p class="status" id="statusMessage" role="status" aria-live="polite">提示：先试读几句，再调整字号和速度。</p>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script>
+    window.SCRIPT_LIBRARY = /* SCRIPT_LIBRARY */ [{"id": "yufeng-01", "title": "冷镦机突然停机，先说清这几件事", "category": "维修", "text": "冷镦机突然停机，联系维修时，先说清楚：设备是什么品牌型号，是启动不了，还是运行中停机？\n\n停机前有没有异响、报警或者动作异常？\n\n常熟宇峰机械承接多工位冷镦机维修。\n\n把所在地区、设备型号和故障表现发来，先了解情况，再沟通检查和维修安排。"}, {"id": "yufeng-02", "title": "买冷镦机配件，先把型号尺寸对准", "category": "配件", "text": "冷镦机配件损坏，找配件时，型号和尺寸一定要核对清楚。\n\n夹钳、衬套、凸轮等零件，名称相同，也要确认具体结构和安装位置。\n\n我们提供冷镦机相关配件供应，可以把设备型号、旧件照片和关键尺寸发来，先核对适配情况，再确认报价与货期。"}, {"id": "yufeng-03", "title": "老冷镦机精度下降，先评估维修范围", "category": "大修", "text": "老冷镦机加工尺寸不稳定，先结合产品缺陷、模具工艺和设备状态检查，再判断需要局部维修，还是进一步拆检大修。\n\n常熟宇峰机械承接多工位冷镦机大修，根据检查结果沟通修复、更换和调试项目。\n\n有需要的，把机型、使用情况和主要问题发来。"}, {"id": "yufeng-04", "title": "冷镦机出故障，能不能上门修？", "category": "维修", "text": "冷镦机出了故障，能不能在客户现场处理，要看故障部位、维修项目和现场条件。\n\n我们提供冷镦机上门维修服务；涉及进一步拆检、加工或其他处理的项目，再沟通具体安排。\n\n需要上门检查的，先提供所在地区、设备型号和故障现象，便于确认服务安排。"}, {"id": "yufeng-05", "title": "老冷镦机值不值得大修，怎么看？", "category": "大修", "text": "一台老冷镦机值不值得大修，要把主要部件状态、今后加工的产品、维修费用和停机时间放在一起考虑。\n\n有的适合局部修复，有的需要较全面的大修，具体要检查后判断。\n\n把设备型号、使用情况和目前的问题发来，我们结合实际情况讨论检修方案。"}, {"id": "yufeng-06", "title": "冷镦机大修，拆开后主要看什么？", "category": "大修", "text": "冷镦机大修，拆检阶段要把相关部件的磨损、损伤和配合情况查清楚，再确定哪些需要修复、哪些需要更换，以及后续装配和调试项目。\n\n看维修过程，可以重点看检查发现、处理依据和试机记录，这些更能说明一台设备具体做了哪些维修。"}, {"id": "yufeng-07", "title": "冷镦机夹料不稳，先查动作配合", "category": "维修", "text": "多工位冷镦机夹料不稳、交接掉料，可能涉及夹钳磨损、安装位置或相关机构的动作配合，需要结合机型和故障出现的位置检查。\n\n我们承接冷镦机相关故障排查。\n\n咨询时说明在哪一工位、什么情况下出现问题，便于进一步沟通。"}, {"id": "yufeng-08", "title": "同一配件反复坏，原因要查清楚", "category": "维修", "text": "冷镦机同一个配件反复损坏，除了更换零件，还要结合损坏位置和使用情况，检查适配、安装、润滑及相关机构状态。\n\n把旧件照片、设备型号，以及每次损坏前后的表现整理好，有助于确定排查方向。\n\n维修和配件需求都可以联系常熟宇峰机械。"}, {"id": "yufeng-09", "title": "冷镦机修完，怎么确认维修结果？", "category": "大修", "text": "冷镦机维修后，要根据本次维修内容，检查相关功能、动作配合和试机表现；涉及产品质量的项目，再结合约定的试样要求确认。\n\n维修前把验收项目沟通清楚，维修后逐项核对。\n\n有设备检修需求，可以先把具体问题发来讨论。"}, {"id": "yufeng-10", "title": "冷镦机维修报价，要确认哪些项目？", "category": "维修", "text": "沟通冷镦机维修报价时，可以把检修哪些部位、需要哪些配件、是否涉及加工，以及上门、运输和调试费用分别确认。\n\n这样才方便判断报价对应的工作范围。\n\n需要了解维修费用的，先提供设备型号、故障表现和所在地区，再结合具体项目沟通。"}, {"id": "yufeng-11", "title": "冷镦机小修和大修，怎么区分？", "category": "大修", "text": "冷镦机小修，通常针对局部故障；大修涉及更全面的检查、修复、装配和调试。\n\n维修范围要根据设备实际状况确定，局部问题也可能通过小修解决。\n\n需要判断自己的设备适合哪种处理方式，可以把机型、故障表现和以往维修情况发来。"}, {"id": "yufeng-12", "title": "配件没有型号，怎么找适配件？", "category": "配件", "text": "冷镦机配件没有型号，可以先整理设备铭牌、零件安装位置、旧件多角度照片和关键尺寸；有图纸或原采购记录，也可以一起提供。\n\n我们根据资料核对结构与规格，再确认是否能够供应。\n\n找配件时，资料越清楚，越方便核对具体需求。"}, {"id": "yufeng-13", "title": "老冷镦机想改造，先评估这几项", "category": "改造", "text": "老冷镦机准备改造，先看设备结构和状态，再明确想解决什么问题：送料、操作，还是现有产品的加工适配。\n\n目标清楚，才方便讨论改哪些部位、投入多少、需要多久。\n\n我们承接冷镦机改造评估，可以把设备型号、现有问题和改造目标发来。"}, {"id": "yufeng-14", "title": "接了非标件订单，现有设备能做吗？", "category": "改造", "text": "接到非标件订单，先把产品图纸、材料要求和现有冷镦机参数核对清楚，再评估加工条件及可能需要的调整。\n\n能实施的项目，再讨论具体改造方案、费用和周期。\n\n需要评估的，可以私信提供设备型号与产品资料，先把加工要求沟通清楚。"}, {"id": "yufeng-15", "title": "想提高产能，先找设备卡在哪一环", "category": "改造", "text": "想改善冷镦机生产效率，先看看时间主要耗在哪里：是故障停机多、送料交接不顺，还是换模调试时间长？\n\n把影响生产的具体环节找出来，再评估维修、调整或改造的必要性。\n\n咨询时，可以说明当前产品、运行情况和主要问题，先讨论可改善的方向。"}, {"id": "yufeng-16", "title": "冷镦机维修要多久，取决于哪些项目？", "category": "维修", "text": "冷镦机维修周期，要结合检修项目判断。\n\n处理局部故障，和涉及拆检、零件加工、重新装配，所需时间会有差别，还要考虑配件供应和作业条件。\n\n安排检修前，把设备情况和计划停机时间说明白，检查后再确认项目与周期，方便工厂安排生产。"}, {"id": "yufeng-17", "title": "修冷镦机，先把维修范围说清楚", "category": "维修", "text": "安排冷镦机维修前，建议把这次要解决的故障、检查范围、拟处理项目和需要确认的事项沟通清楚。\n\n拆检过程中如果发现其他问题，再讨论是否增加维修内容。\n\n常熟宇峰机械承接冷镦机维修与大修，具体项目根据设备情况沟通确认。"}, {"id": "yufeng-18", "title": "故障时有时无，报修时怎么描述？", "category": "维修", "text": "冷镦机故障时有时无，报修时可以说明：开机多久出现、加工什么产品时出现、发生频率怎样，以及近期换过或调整过哪些部位。\n\n有已有的报警记录、照片或视频，也可以一起提供。\n\n这些资料能帮助维修人员了解情况，确定后续检查方向。"}, {"id": "yufeng-19", "title": "闲置冷镦机重新启用，先安排检查", "category": "维修", "text": "长期闲置的冷镦机准备重新投入生产，先结合停放时间、保存状态和原有故障，确定需要检查的项目。\n\n涉及润滑、电气、相关机构状态和试机的内容，按设备实际情况安排。\n\n厂里有闲置设备准备重新启用，可以把型号、照片和已知问题发来沟通。"}, {"id": "yufeng-20", "title": "多台冷镦机要检修，怎么分批安排？", "category": "大修", "text": "工厂有多台冷镦机需要检修，可以先整理每台设备的故障、生产任务和可停机时间，再结合配件与维修项目分批安排。\n\n常熟宇峰机械承接冷镦机维修和大修。\n\n需要集中安排检修的，可以先提供设备清单、主要问题和计划时间，沟通检查及实施顺序。"}];
+  </script>
+  <script>
+  (() => {
+    "use strict";
+    const STORAGE_KEY = "yufeng.teleprompter.v1";
+    const CUSTOM_ID = "__custom__";
+    const $ = id => document.getElementById(id);
+    const ui = { app: $("app"), select: $("scriptSelect"), editor: $("scriptEditor"), pane: $("editorPane"), editToggle: $("editToggle"), copy: $("readingCopy"), viewport: $("scrollViewport"), stage: $("stage"), play: $("playButton"), state: $("stateLabel"), status: $("statusMessage"), save: $("saveState"), progress: $("readingProgress"), progressText: $("progressText"), countdown: $("countdown"), count: $("countdownNumber"), file: $("fileInput"), focus: $("focusButton"), fullscreen: $("fullscreenButton") };
+    const defaults = { fontSize: 44, speed: 32, lineHeight: 1.8, mirror: false, countdown: true, readingLine: true };
+    const library = [];
+    const knownIds = new Set();
+    for (const [index, item] of (Array.isArray(window.SCRIPT_LIBRARY) ? window.SCRIPT_LIBRARY : []).entries()) {
+      if (!item || typeof item !== "object") continue;
+      let id = String(item.id ?? "script-" + (index + 1));
+      if (id === CUSTOM_ID || knownIds.has(id)) id = "script-" + (index + 1) + "-" + id;
+      const value = item.text ?? item.content ?? item.body;
+      if (typeof value !== "string") continue;
+      knownIds.add(id);
+      library.push({ id, title: String(item.title ?? "文稿 " + (index + 1)), text: value });
+    }
+    let settings = { ...defaults };
+    let selectedId = library[0]?.id || CUSTOM_ID;
+    let drafts = Object.create(null);
+    let storageAvailable = true;
+    let saveTimer = 0;
+    let running = false;
+    let counting = false;
+    let finished = false;
+    let frame = 0;
+    let lastTime = null;
+    let scrollPosition = 0;
+    let countdownTimer = 0;
+    let wakeLock = null;
+    let wakePending = false;
+    let focused = false;
+    let hadFullscreen = false;
+    let resizeFrame = 0;
+
+    const clamp = (value, min, max, fallback) => Number.isFinite(Number(value)) ? Math.min(max, Math.max(min, Number(value))) : fallback;
+    function readStorage() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+        if (!saved || typeof saved !== "object") return;
+        if (saved.drafts && typeof saved.drafts === "object") {
+          for (const [id, text] of Object.entries(saved.drafts)) if (typeof text === "string") drafts[id] = text;
+        }
+        if (saved.selectedId === CUSTOM_ID || knownIds.has(saved.selectedId)) selectedId = saved.selectedId;
+        const s = saved.settings || {};
+        settings = { fontSize: Math.round(clamp(s.fontSize, 24, 96, defaults.fontSize)), speed: Math.round(clamp(s.speed, 10, 100, defaults.speed)), lineHeight: Math.round(clamp(s.lineHeight, 1.4, 2.4, defaults.lineHeight) * 10) / 10, mirror: typeof s.mirror === "boolean" ? s.mirror : defaults.mirror, countdown: typeof s.countdown === "boolean" ? s.countdown : defaults.countdown, readingLine: typeof s.readingLine === "boolean" ? s.readingLine : defaults.readingLine };
+      } catch (_) { storageAvailable = false; }
+    }
+    function saveNow() {
+      clearTimeout(saveTimer);
+      drafts[selectedId] = ui.editor.value;
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, selectedId, drafts, settings }));
+        storageAvailable = true;
+        ui.save.textContent = "已保存到本机";
+      } catch (_) {
+        storageAvailable = false;
+        ui.save.textContent = "仅本次使用";
+      }
+      ui.save.classList.toggle("unavailable", !storageAvailable);
+    }
+    function queueSave() {
+      clearTimeout(saveTimer);
+      ui.save.textContent = storageAvailable ? "正在保存…" : "仅本次使用";
+      saveTimer = setTimeout(saveNow, 250);
+    }
+    function message(text) { ui.status.textContent = text; }
+    function maxScroll() { return Math.max(0, ui.viewport.scrollHeight - ui.viewport.clientHeight); }
+    function updateProgress() {
+      const total = maxScroll();
+      const percent = total > 0 ? Math.min(100, Math.max(0, Math.round(ui.viewport.scrollTop / total * 100))) : 0;
+      ui.progress.value = percent;
+      ui.progressText.textContent = percent + "%";
+    }
+    function updatePlayButton() {
+      ui.play.textContent = running ? "暂停" : counting ? "取消倒计时" : finished ? "重播" : "开始";
+      ui.play.setAttribute("aria-label", running ? "暂停提词" : counting ? "取消倒计时" : finished ? "从头重播" : "开始提词");
+      ui.play.setAttribute("aria-pressed", String(running || counting));
+    }
+    function renderText() {
+      const text = ui.editor.value;
+      ui.copy.textContent = text || "先选择一篇文稿，\n或打开编辑区粘贴内容。";
+      ui.copy.classList.toggle("empty", !text.trim());
+      $("wordCount").textContent = Array.from(text.replace(/\s/g, "")).length + " 字";
+    }
+    function resetPosition() {
+      ui.viewport.scrollTop = 0;
+      scrollPosition = 0;
+      finished = false;
+      ui.state.textContent = "准备就绪";
+      updatePlayButton();
+      updateProgress();
+    }
+    function setEditorOpen(open, moveFocus = false) {
+      if (open) pause("已暂停，编辑完成后可重新开始。");
+      ui.app.classList.toggle("editor-open", open);
+      ui.editToggle.setAttribute("aria-expanded", String(open));
+      ui.editToggle.textContent = open ? "收起编辑" : "编辑文稿";
+      if (moveFocus && open) ui.editor.focus();
+    }
+    function loadScript(id) {
+      pause();
+      drafts[selectedId] = ui.editor.value;
+      selectedId = id === CUSTOM_ID || knownIds.has(id) ? id : CUSTOM_ID;
+      ui.select.value = selectedId;
+      const original = library.find(item => item.id === selectedId);
+      ui.editor.value = Object.prototype.hasOwnProperty.call(drafts, selectedId) ? drafts[selectedId] : original?.text || "";
+      renderText();
+      resetPosition();
+      queueSave();
+      message("已切换文稿。修改和切换文稿会回到开头。");
+    }
+    function applySettings() {
+      document.documentElement.style.setProperty("--font-size", settings.fontSize + "px");
+      document.documentElement.style.setProperty("--line-height", String(settings.lineHeight));
+      ui.copy.classList.toggle("mirrored", settings.mirror);
+      $("readingLine").hidden = !settings.readingLine;
+      $("fontSize").value = settings.fontSize;
+      $("scrollSpeed").value = settings.speed;
+      $("lineHeight").value = settings.lineHeight;
+      $("fontSizeOutput").textContent = settings.fontSize;
+      $("scrollSpeedOutput").textContent = settings.speed + " px/s";
+      $("lineHeightOutput").textContent = settings.lineHeight.toFixed(1) + " 倍";
+      $("mirrorToggle").checked = settings.mirror;
+      $("countdownToggle").checked = settings.countdown;
+      $("lineToggle").checked = settings.readingLine;
+      scrollPosition = ui.viewport.scrollTop;
+      updateProgress();
+    }
+    async function acquireWakeLock() {
+      if (!running || document.hidden || wakeLock || wakePending || !navigator.wakeLock || typeof navigator.wakeLock.request !== "function") return;
+      wakePending = true;
+      try {
+        const lock = await navigator.wakeLock.request("screen");
+        if (!running || document.hidden) { await lock.release(); return; }
+        wakeLock = lock;
+        lock.addEventListener("release", () => { if (wakeLock === lock) wakeLock = null; });
+      } catch (_) { /* Screen wake lock is an optional enhancement. */ }
+      finally { wakePending = false; }
+    }
+    function releaseWakeLock() {
+      const lock = wakeLock;
+      wakeLock = null;
+      if (lock) { try { const released = lock.release(); if (released && typeof released.catch === "function") released.catch(() => {}); } catch (_) {} }
+    }
+    function pause(note) {
+      running = false;
+      counting = false;
+      cancelAnimationFrame(frame);
+      clearTimeout(countdownTimer);
+      frame = 0;
+      lastTime = null;
+      ui.countdown.hidden = true;
+      releaseWakeLock();
+      if (!finished) ui.state.textContent = "已暂停";
+      updatePlayButton();
+      if (note) message(note);
+    }
+    function tick(timestamp) {
+      if (!running) return;
+      if (lastTime !== null) {
+        const seconds = Math.min((timestamp - lastTime) / 1000, 0.1);
+        scrollPosition = Math.min(maxScroll(), scrollPosition + settings.speed * seconds);
+        ui.viewport.scrollTop = scrollPosition;
+        updateProgress();
+        if (maxScroll() <= 0 || scrollPosition >= maxScroll() - 0.5) {
+          finished = true;
+          pause();
+          ui.state.textContent = "已读完";
+          message("这一篇读完了，点击“重播”可从开头再来一次。");
+          updatePlayButton();
+          return;
+        }
+      }
+      lastTime = timestamp;
+      frame = requestAnimationFrame(tick);
+    }
+    function beginPlayback() {
+      counting = false;
+      ui.countdown.hidden = true;
+      if (document.hidden) { pause(); return; }
+      running = true;
+      lastTime = null;
+      scrollPosition = ui.viewport.scrollTop;
+      ui.state.textContent = "正在提词";
+      message("滑动提词区可暂停；切到后台会自动暂停。");
+      updatePlayButton();
+      acquireWakeLock();
+      frame = requestAnimationFrame(tick);
+    }
+    function start() {
+      if (!ui.editor.value.trim()) {
+        message("请先选择文稿，或打开编辑区输入内容。");
+        setEditorOpen(true, true);
+        return;
+      }
+      if (finished || (maxScroll() > 0 && ui.viewport.scrollTop >= maxScroll() - 1)) resetPosition();
+      setEditorOpen(false);
+      if (!settings.countdown) { beginPlayback(); return; }
+      counting = true;
+      let remaining = 3;
+      ui.count.textContent = remaining;
+      ui.countdown.hidden = false;
+      ui.state.textContent = "准备开始";
+      updatePlayButton();
+      const next = () => {
+        if (!counting) return;
+        remaining -= 1;
+        if (remaining <= 0) { beginPlayback(); return; }
+        ui.count.textContent = remaining;
+        countdownTimer = setTimeout(next, 1000);
+      };
+      countdownTimer = setTimeout(next, 1000);
+    }
+    function togglePlayback() { if (running || counting) pause("已暂停，点击“开始”继续。"); else start(); }
+    function setFocusMode(value) {
+      focused = value;
+      if (value) setEditorOpen(false);
+      ui.app.classList.toggle("focus", value);
+      ui.focus.textContent = value ? "退出专注" : "专注";
+      ui.focus.setAttribute("aria-pressed", String(value));
+      scheduleLayout();
+    }
+    function fullscreenElement() { return document.fullscreenElement || document.webkitFullscreenElement; }
+    async function toggleFullscreen() {
+      if (fullscreenElement()) {
+        const exit = document.exitFullscreen || document.webkitExitFullscreen;
+        if (exit) { try { await exit.call(document); } catch (_) { message("可使用浏览器的退出全屏操作。"); } }
+        return;
+      }
+      const enter = ui.app.requestFullscreen || ui.app.webkitRequestFullscreen;
+      setFocusMode(true);
+      if (!enter) { message("当前浏览器不支持网页全屏，已进入专注模式。"); return; }
+      try { await enter.call(ui.app); }
+      catch (_) { message("未能进入网页全屏，已使用专注模式。"); }
+    }
+    function fullscreenChanged() {
+      const active = Boolean(fullscreenElement());
+      ui.fullscreen.textContent = active ? "退出全屏" : "全屏";
+      ui.fullscreen.setAttribute("aria-pressed", String(active));
+      if (active) setFocusMode(true);
+      else if (hadFullscreen) setFocusMode(false);
+      hadFullscreen = active;
+      scheduleLayout();
+    }
+    function scheduleLayout() {
+      cancelAnimationFrame(resizeFrame);
+      resizeFrame = requestAnimationFrame(() => {
+        const before = maxScroll();
+        const ratio = before > 0 ? ui.viewport.scrollTop / before : 0;
+        const height = ui.viewport.clientHeight;
+        ui.copy.style.setProperty("--lead-space", Math.round(height * 0.3) + "px");
+        ui.copy.style.setProperty("--tail-space", Math.round(height * 0.7) + "px");
+        ui.viewport.scrollTop = ratio * maxScroll();
+        scrollPosition = ui.viewport.scrollTop;
+        updateProgress();
+      });
+    }
+
+    readStorage();
+    library.forEach((item, index) => {
+      const option = document.createElement("option");
+      option.value = item.id;
+      option.textContent = String(index + 1).padStart(2, "0") + " · " + item.title;
+      ui.select.appendChild(option);
+    });
+    const customOption = document.createElement("option");
+    customOption.value = CUSTOM_ID;
+    customOption.textContent = "自定义文稿";
+    ui.select.appendChild(customOption);
+    ui.select.value = selectedId;
+    const initialScript = library.find(item => item.id === selectedId);
+    ui.editor.value = Object.prototype.hasOwnProperty.call(drafts, selectedId) ? drafts[selectedId] : initialScript?.text || "";
+    renderText();
+    applySettings();
+    resetPosition();
+    saveNow();
+    scheduleLayout();
+
+    ui.select.addEventListener("change", () => loadScript(ui.select.value));
+    ui.editToggle.addEventListener("click", () => setEditorOpen(!ui.app.classList.contains("editor-open")));
+    $("editorClose").addEventListener("click", () => { ui.editor.blur(); setEditorOpen(false); ui.editToggle.focus(); });
+    $("customButton").addEventListener("click", () => { loadScript(CUSTOM_ID); ui.editor.focus(); });
+    ui.editor.addEventListener("input", () => {
+      pause();
+      renderText();
+      resetPosition();
+      queueSave();
+    });
+    $("importButton").addEventListener("click", () => { pause(); ui.file.click(); });
+    ui.file.addEventListener("change", async () => {
+      const file = ui.file.files && ui.file.files[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) { message("这份文稿较大，请导入 2 MB 以内的 UTF-8 TXT 文件。"); ui.file.value = ""; return; }
+      try {
+        const text = typeof file.text === "function" ? await file.text() : await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result || "")); reader.onerror = reject; reader.readAsText(file, "UTF-8"); });
+        const imported = String(text).replace(/^\uFEFF/, "");
+        const currentCustom = selectedId === CUSTOM_ID ? ui.editor.value : drafts[CUSTOM_ID] || "";
+        if (currentCustom.trim() && currentCustom !== imported && !window.confirm("导入会替换已有的自定义文稿，是否继续？")) {
+          message("已取消导入，保留原自定义文稿。");
+          ui.file.value = "";
+          return;
+        }
+        loadScript(CUSTOM_ID);
+        ui.editor.value = imported;
+        renderText();
+        resetPosition();
+        queueSave();
+        message("已导入“" + file.name + "”。如有乱码，请将原文件另存为 UTF-8 后重试。");
+      } catch (_) { message("读取失败，请重新选择 UTF-8 编码的 TXT 文件。"); }
+      ui.file.value = "";
+    });
+    [["fontSize", "fontSize"], ["scrollSpeed", "speed"], ["lineHeight", "lineHeight"]].forEach(([id, key]) => {
+      $(id).addEventListener("input", event => {
+        const ratio = maxScroll() > 0 ? ui.viewport.scrollTop / maxScroll() : 0;
+        settings[key] = Number(event.target.value);
+        applySettings();
+        ui.viewport.scrollTop = ratio * maxScroll();
+        scrollPosition = ui.viewport.scrollTop;
+        updateProgress();
+        queueSave();
+      });
+    });
+    [["mirrorToggle", "mirror"], ["countdownToggle", "countdown"], ["lineToggle", "readingLine"]].forEach(([id, key]) => $(id).addEventListener("change", event => { settings[key] = event.target.checked; applySettings(); queueSave(); }));
+    ui.play.addEventListener("click", togglePlayback);
+    $("resetButton").addEventListener("click", () => { pause(); resetPosition(); message("已回到开头，点击“开始”提词。"); });
+    ui.focus.addEventListener("click", () => setFocusMode(!focused));
+    ui.fullscreen.addEventListener("click", toggleFullscreen);
+    ui.viewport.addEventListener("scroll", () => { if (!running) scrollPosition = ui.viewport.scrollTop; if (finished && ui.viewport.scrollTop < maxScroll() - 2) { finished = false; ui.state.textContent = "已暂停"; updatePlayButton(); } updateProgress(); }, { passive: true });
+    const manualPause = () => { if (running || counting) pause("已暂停，可手动调整阅读位置。"); };
+    ui.viewport.addEventListener("pointerdown", manualPause, { passive: true });
+    ui.viewport.addEventListener("touchstart", manualPause, { passive: true });
+    ui.viewport.addEventListener("wheel", manualPause, { passive: true });
+    ui.viewport.addEventListener("keydown", event => { if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End"].includes(event.key)) manualPause(); });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") { if (ui.app.classList.contains("editor-open")) setEditorOpen(false); else if (focused && !fullscreenElement()) setFocusMode(false); return; }
+      if (event.code !== "Space" || event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
+      const target = event.target;
+      if (target instanceof HTMLElement && (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT", "BUTTON", "SUMMARY"].includes(target.tagName))) return;
+      event.preventDefault();
+      togglePlayback();
+    });
+    document.addEventListener("visibilitychange", () => { if (document.hidden) { if (running || counting) pause("已暂停：切回页面后，点击“开始”继续。"); saveNow(); } });
+    window.addEventListener("pagehide", () => { pause(); saveNow(); });
+    window.addEventListener("resize", scheduleLayout, { passive: true });
+    if (window.visualViewport) window.visualViewport.addEventListener("resize", scheduleLayout, { passive: true });
+    if (typeof ResizeObserver === "function") new ResizeObserver(scheduleLayout).observe(ui.stage);
+    document.addEventListener("fullscreenchange", fullscreenChanged);
+    document.addEventListener("webkitfullscreenchange", fullscreenChanged);
+    $("moreSettings").addEventListener("toggle", scheduleLayout);
+  })();
+  </script>
+</body>
+</html>
