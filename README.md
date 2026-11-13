@@ -14,6 +14,8 @@
 
 | 工具 | 路径 | 说明 |
 | --- | --- | --- |
+| 工件重量计算器 | `/tools/workpiece-weight-calculator.html` | 零件原材料重量、加工余量、批量金额及累计导出 |
+| IATF 16949 核心工具指南 | `/tools/iatf16949/项目目录/index.html` | 质量管理图文资料与 Mermaid 源文件 |
 | 口播提词器 | `/tools/teleprompter.html` | 手机与 iPad 提词，内置20稿，批量识别导入、TXT/JSON导出、编辑、删除与撤销、二维码共享、本机保存 |
 | Markdown HTML Renderer | `/tools/markdown-html-renderer.html` | Markdown 预览、Mermaid 渲染、独立 HTML 导出 |
 | 成人性生活满意度统计表 | `/tools/成人性生活满意度统计表.html` | 面向成年人，用五级量表统计亲密关系满意度、沟通舒适度和改善方向 |
@@ -27,9 +29,10 @@
 当前页面版本：
 
 ```text
-v1.0.7
+v1.0.8
 ```
 
+- `v1.0.8`：归入工件重量计算器与 IATF 16949 核心工具指南，增加可直接打开的 `public/offline.html` 本地入口。
 - `v1.0.7`：提词器升级v1.2.0，批量粘贴识别、TXT/JSON预览导入与导出、单篇/批量删除与撤销、二维码共享，保留旧稿。
 - `v1.0.6`：提词器升级v1.1.0，左侧文稿列表、点击切换、标题正文编辑和多篇新增，保留旧版草稿。
 - `v1.0.5`：新增口播提词器 v1.0.0，适配手机与 iPad，支持内置20稿、编辑、TXT导入、调速、镜像、专注与本机保存。
@@ -192,3 +195,11 @@ data/
 - 菜单排序和隐藏配置保存在 `data/menu-config.json`
 - 需要多人数据、AI 分析、小程序共用数据或在线保存时，优先通过 Next.js API 扩展
 - AI API Key 不应放在前端，应放在服务端环境变量中
+
+## 本地工具归并（2026-11-13）
+
+直接打开 `public/offline.html` 使用统一入口；完整网站仍使用原启动命令。独立 HTML 工具及资料统一归本项目维护，不再为每个单页建立独立项目。IATF 原始图文与源文件完整保留，其独立 GitFinder 身份已移入迁移备份。原指南目录与计算器文件路径保留兼容链接。
+
+本地入口由 `npm run build:offline` 根据同一工具目录生成；`npm run build` 会自动更新，无需另维护一份工具清单。
+
+范围与验证记录见 `docs/html-consolidation-20261113.md`。

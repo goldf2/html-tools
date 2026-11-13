@@ -1,0 +1,19 @@
+flowchart LR
+    A["客户要求 / 图纸 / 法规 / CSR"] --> B["APQP"]
+    B --> C["DFMEA / PFMEA"]
+    C --> D["Process Flow"]
+    D --> E["Control Plan"]
+    E --> F["MSA"]
+    E --> G["SPC"]
+    C --> E
+    F --> H["PPAP"]
+    G --> H
+    C --> H
+    D --> H
+    E --> H
+    H --> I["客户批准 / 量产"]
+    I --> J["现场问题 / 工程变更 / 持续改进"]
+    J --> C
+    J --> E
+    J --> G
+

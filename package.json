@@ -1,12 +1,13 @@
 {
   "name": "html-tools",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/build-offline.mjs && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build:offline": "node scripts/build-offline.mjs"
   },
   "dependencies": {
     "next": "^15.3.0",

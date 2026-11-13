@@ -1,7 +1,7 @@
 (function () {
   if (document.querySelector('.site-nav')) return;
 
-  var APP_VERSION = '1.0.7';
+  var APP_VERSION = '1.0.8';
 
   function absoluteHref(href) {
     return href && href.charAt(0) === '/' ? href : '/' + href;

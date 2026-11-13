@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IATF 16949 与五大工具关系资料</title>
+  <style>
+    :root {
+      --bg: #f5f1e8;
+      --paper: #fffdf8;
+      --ink: #1f2a2e;
+      --muted: #5b6a6f;
+      --accent: #a54b1a;
+      --line: #d8cdbd;
+      --soft: #efe6d8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, #f0dfbf 0, transparent 32%),
+        radial-gradient(circle at bottom right, #d8e8df 0, transparent 30%),
+        var(--bg);
+      line-height: 1.6;
+    }
+    .wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 40px 20px 56px;
+    }
+    .hero {
+      background: linear-gradient(135deg, rgba(255,253,248,0.96), rgba(255,248,236,0.88));
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 18px 50px rgba(84, 66, 35, 0.08);
+    }
+    h1, h2 {
+      margin: 0 0 12px;
+      font-family: "STKaiti", "KaiTi", serif;
+      letter-spacing: 0.02em;
+    }
+    h1 { font-size: 36px; }
+    h2 { font-size: 26px; margin-top: 28px; }
+    p { margin: 0 0 12px; color: var(--muted); }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .chip {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      font-size: 14px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+      margin-top: 24px;
+    }
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 14px 36px rgba(84, 66, 35, 0.06);
+    }
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .imgbox {
+      margin-top: 18px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 14px;
+      overflow: hidden;
+      box-shadow: 0 14px 36px rgba(84, 66, 35, 0.06);
+    }
+    img {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: white;
+      border-radius: 14px;
+    }
+    .footer {
+      margin-top: 26px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>IATF 16949 与五大工具关系资料</h1>
+      <p>用于培训、内审讲解和项目启动说明。内容把体系要求、核心工具和客户特殊要求之间的关系放在一张业务链上理解。</p>
+      <div class="chips">
+        <span class="chip">IATF 16949</span>
+        <span class="chip">APQP</span>
+        <span class="chip">PPAP</span>
+        <span class="chip">FMEA</span>
+        <span class="chip">MSA</span>
+        <span class="chip">SPC</span>
+        <span class="chip">Control Plan</span>
+        <span class="chip">CSR</span>
+      </div>
+    </section>
+
+    <section>
+      <h2>资料入口</h2>
+      <div class="grid">
+        <article class="card">
+          <h3>主文档</h3>
+          <p>包含 IATF 16949 与 Core Tools 的条款实务映射、审核追问链路、常见断链点和使用说明。</p>
+          <p><a href="./iatf16949-core-tools-guide.md">打开 Markdown 文档</a></p>
+        </article>
+        <article class="card">
+          <h3>层级关系图</h3>
+          <p>展示 IATF 16949、CSR、五大工具与量产批准之间的总体结构。</p>
+          <p><a href="./iatf16949-core-tools-landscape.svg">打开 SVG</a></p>
+        </article>
+        <article class="card">
+          <h3>业务流关系图</h3>
+          <p>展示从客户要求到 PPAP 再到量产和持续改进的输入输出链路。</p>
+          <p><a href="./iatf16949-core-tools-flow.svg">打开 SVG</a></p>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>层级关系图预览</h2>
+      <div class="imgbox">
+        <img src="./iatf16949-core-tools-landscape.svg" alt="IATF 16949 与五大工具层级关系图" />
+      </div>
+    </section>
+
+    <section>
+      <h2>业务流关系图预览</h2>
+      <div class="imgbox">
+        <img src="./iatf16949-core-tools-flow.svg" alt="IATF 16949 与五大工具业务流关系图" />
+      </div>
+    </section>
+
+    <p class="footer">更新日期: 2026-04-26。正式审核、客户提交和版本适用时，仍需以正式购买的标准原文、AIAG 手册和客户特殊要求为准。</p>
+  </div>
+</body>
+</html>

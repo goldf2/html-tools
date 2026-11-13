@@ -1,6 +1,8 @@
 {
   "order": [
     "teleprompter",
+    "workpiece-weight-calculator",
+    "iatf16949-core-tools",
     "adult-intimacy-satisfaction",
     "high-school-interest",
     "summer-travel-interest",

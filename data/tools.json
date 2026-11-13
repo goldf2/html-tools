@@ -120,6 +120,54 @@
         "web": true,
         "miniProgram": false
       }
+    },
+    {
+      "id": "workpiece-weight-calculator",
+      "title": "工件重量计算器",
+      "href": "tools/workpiece-weight-calculator.html",
+      "description": "按形状、尺寸、材料密度和加工余量计算单件及整批重量、材料金额，支持累计和导入导出。",
+      "category": "制造工具",
+      "badge": "重量与材料成本",
+      "order": 6,
+      "tags": [
+        "零件",
+        "原材料",
+        "毛坯",
+        "重量",
+        "余量",
+        "金额"
+      ],
+      "version": "1.0.0",
+      "kind": "static-html",
+      "platforms": {
+        "web": true,
+        "miniProgram": false
+      }
+    },
+    {
+      "id": "iatf16949-core-tools",
+      "title": "IATF 16949 核心工具指南",
+      "href": "tools/iatf16949/项目目录/index.html",
+      "description": "查看 IATF 16949 与 APQP、PPAP、FMEA、MSA、SPC 和控制计划的关系，附图文资料。",
+      "category": "制造工具",
+      "badge": "质量管理资料",
+      "order": 7,
+      "tags": [
+        "IATF",
+        "16949",
+        "质量",
+        "APQP",
+        "PPAP",
+        "FMEA",
+        "MSA",
+        "SPC"
+      ],
+      "version": "1.0.0",
+      "kind": "static-html",
+      "platforms": {
+        "web": true,
+        "miniProgram": false
+      }
     }
   ]
 }

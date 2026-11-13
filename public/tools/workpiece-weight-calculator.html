@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f6f9">
+  <title>工件重量计算器</title>
+  <style>
+    :root { color-scheme: light; --ink:#1b293f; --muted:#627086; --line:#e2e7ef; --blue:#245ee8; --soft:#eff4ff; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#f4f6f9; color:var(--ink); font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; -webkit-font-smoothing:antialiased; }
+    button,input,select,textarea { font:inherit; }
+    button,select { cursor:pointer; }
+    button { -webkit-tap-highlight-color:transparent; }
+    button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible,a:focus-visible,textarea:focus-visible { outline:3px solid #86aaff; outline-offset:3px; }
+    .shell { max-width:1160px; margin:auto; padding:34px 28px 28px; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:34px; }
+    .brand { display:flex; align-items:center; gap:10px; font-size:14px; font-weight:650; letter-spacing:.04em; }
+    .brand-icon { width:34px; height:34px; display:grid; place-items:center; border-radius:10px; background:var(--ink); color:white; }
+    .brand-icon svg { width:21px; height:21px; }
+    .offline { display:flex; align-items:center; gap:7px; color:var(--muted); font-size:12px; }
+    .offline::before { content:""; width:6px; height:6px; border-radius:50%; background:#248768; }
+    .intro { margin-bottom:27px; }
+    .eyebrow { margin:0 0 8px; color:var(--blue); font-size:11px; font-weight:700; letter-spacing:.14em; }
+    h1 { font-size:32px; line-height:1.3; letter-spacing:-.035em; margin:0 0 10px; font-weight:750; }
+    .intro p:last-child { color:var(--muted); font-size:14px; margin:0; line-height:1.7; }
+    .workspace { display:grid; grid-template-columns:1.08fr 1fr; gap:22px; align-items:start; }
+    .panel { background:white; border:1px solid var(--line); border-radius:18px; overflow:hidden; }
+    .inputs { padding:26px; }
+    .section + .section { border-top:1px solid var(--line); margin-top:24px; padding-top:23px; }
+    .section-title { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:16px; }
+    h2 { display:flex; align-items:center; gap:10px; margin:0; font-size:15px; font-weight:650; }
+    .step { color:#687791; font-size:11px; font-weight:650; font-variant-numeric:tabular-nums; }
+    .shape-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; }
+    .shape-button { position:relative; display:flex; flex-direction:column; align-items:center; gap:8px; padding:13px 4px 12px; border:1px solid var(--line); border-radius:11px; background:white; color:#617088; font-size:12px; min-height:84px; }
+    .shape-button svg { width:35px; height:29px; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linejoin:round; }
+    .shape-button:hover { background:#f8faff; border-color:#a4bcec; }
+    .shape-button[aria-pressed="true"] { background:var(--soft); border-color:var(--blue); color:var(--blue); box-shadow:inset 0 0 0 .5px var(--blue); font-weight:650; }
+    .shape-button[aria-pressed="true"]::after { content:""; position:absolute; right:9px; top:9px; height:5px; width:5px; background:var(--blue); border-radius:50%; }
+    .field-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; }
+    .material-grid { grid-template-columns:1.25fr 1fr; }
+    .field { min-width:0; }
+    .field label { display:block; margin-bottom:8px; color:#536176; font-size:12px; line-height:1.5; }
+    .field label b { display:inline-block; color:var(--blue); font-size:11px; margin-left:5px; font-weight:600; }
+    .input-wrap { display:flex; align-items:center; position:relative; }
+    input,select { width:100%; min-width:0; height:45px; border:1px solid #dce3ed; background:#fff; color:var(--ink); border-radius:8px; padding:0 12px; font-size:15px; }
+    input { font-variant-numeric:tabular-nums; }
+    input:hover,select:hover { border-color:#aebdd0; }
+    input[readonly] { background:#f7f9fc; color:#526179; }
+    input[aria-invalid="true"] { border-color:#c84343; background:#fffafa; }
+    input::-webkit-inner-spin-button,input::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+    input[type=number] { -moz-appearance:textfield; }
+    .input-wrap input { padding-right:48px; }
+    .input-wrap .density-input { padding-right:64px; }
+    .input-wrap #unit-price { padding-right:64px; }
+    .suffix { position:absolute; right:12px; color:#77849a; font-size:12px; pointer-events:none; }
+    .allowance-row { display:grid; grid-template-columns:48px minmax(0,1fr); align-items:center; gap:6px; margin-top:8px; }
+    .allowance-row label { font-size:11px; margin:0; }
+    .allowance-row input { height:36px; background:#f7faff; font-size:16px; }
+    .effective-size { display:block; color:#416ca5; font-size:11px; margin-top:7px; overflow-wrap:anywhere; }
+    .allowance-help { margin:0 0 16px; padding:10px 12px; background:#f4f7fc; border-radius:8px; color:#5a6d88; font-size:11px; line-height:1.8; }
+    .help { color:var(--muted); font-size:11px; line-height:1.7; margin:11px 0 0; }
+    .unit-select { width:96px; height:32px; font-size:12px; background:#f8fafc; padding-left:9px; }
+    .error { margin:15px 0 0; padding:10px 12px; background:#fff2f0; border-radius:8px; color:#aa3030; font-size:12px; line-height:1.6; }
+    [hidden] { display:none !important; }
+    .result-column { min-width:0; display:grid; gap:16px; }
+    .weight-panel { background:#182941; color:white; border-radius:18px; padding:26px; }
+    .result-top { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .result-top h2 { font-size:13px; color:#c8d5e9; font-weight:500; }
+    .live-badge { display:inline-flex; align-items:center; gap:6px; font-size:10px; color:#b3c9ed; }
+    .live-badge::before { content:""; background:#8eafe8; border-radius:50%; width:5px; height:5px; }
+    .weight-main { display:flex; align-items:baseline; flex-wrap:wrap; gap:10px; margin:17px 0 3px; }
+    .weight-value { font-size:clamp(30px,4.3vw,54px); font-weight:600; letter-spacing:-.045em; line-height:1.18; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+    .weight-unit { color:#b9cbe6; font-size:18px; }
+    .weight-secondary { min-height:20px; font-size:13px; color:#adbed7; font-variant-numeric:tabular-nums; }
+    .allowance-weight-note { margin:9px 0 0; font-size:11px; line-height:1.7; color:#b9cbe1; }
+    .price-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; padding-top:16px; margin-top:16px; border-top:1px solid #34445c; }
+    .price-row span { display:block; color:#b9cbe1; font-size:11px; margin-bottom:6px; }
+    .price-row strong { font-size:19px; font-weight:600; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+    .total-row { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:10px; margin-top:23px; padding-top:18px; border-top:1px solid #34445c; }
+    .total-label { color:#b9cbe1; font-size:12px; }
+    .total-value { font-size:24px; font-weight:600; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+    .total-value small { color:#b9cbe1; font-size:12px; font-weight:400; margin-left:4px; }
+    .copy-button { margin-top:20px; height:41px; border:1px solid #506b92; border-radius:8px; width:100%; display:flex; align-items:center; justify-content:center; gap:8px; background:#263d5e; color:#e9f1ff; font-size:12px; }
+    .copy-button:hover:not(:disabled) { background:#324e77; }
+    .copy-button:disabled { opacity:.45; cursor:not-allowed; }
+    .copy-button svg { width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:1.7; }
+    .result-actions { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:20px; }
+    .result-actions .copy-button { margin-top:0; }
+    .add-button { background:var(--blue); border-color:#5484f5; }
+    .add-button:hover:not(:disabled) { background:#3971f2; }
+    .copy-feedback { color:#cedcf0; font-size:11px; line-height:1.6; margin:8px 0 0; }
+    .copy-fallback { width:100%; min-height:115px; padding:10px; margin-top:10px; border-radius:6px; border:1px solid #6d819f; background:#f8faff; color:var(--ink); font-size:12px; }
+    .drawing-header { display:flex; align-items:center; justify-content:space-between; padding:17px 20px 0; gap:10px; }
+    .drawing-header h2 { font-size:12px; }
+    .drawing-header span { color:#7b899c; font-size:10px; }
+    .drawing-canvas { margin:10px 12px 0; background-image:radial-gradient(#dce4ef .8px,transparent .8px); background-size:16px 16px; }
+    .drawing-canvas svg { display:block; width:100%; height:205px; }
+    .body-face { stroke:#4273c3; stroke-width:1.5; stroke-linejoin:round; }
+    .dimension { stroke:#7292c4; stroke-width:1; fill:none; }
+    .extension { stroke:#9cb2d2; stroke-width:.8; }
+    .dim-label { fill:#295ea8; font-size:12px; font-weight:600; paint-order:stroke; stroke:#fff; stroke-width:5px; stroke-linejoin:round; }
+    .volume-row { display:flex; justify-content:space-between; gap:12px; border-top:1px solid var(--line); padding:14px 20px; font-size:12px; }
+    .volume-row span:first-child { color:var(--muted); }
+    .volume-row strong { font-weight:600; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+    .formula-panel { padding:17px 20px; }
+    .formula-panel h2 { font-size:12px; color:#526176; margin-bottom:9px; }
+    .formula { font-family:"SFMono-Regular",Consolas,monospace; color:#2c4c79; font-size:12px; line-height:1.8; overflow-wrap:anywhere; }
+    .formula-note { color:var(--muted); font-size:11px; line-height:1.75; margin:7px 0 0; }
+    .accumulator { margin-top:22px; padding:22px 26px; }
+    .accumulator-header { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; }
+    .data-actions { display:flex; flex-wrap:wrap; gap:7px; }
+    .data-feedback { margin:12px 0 0; font-size:12px; line-height:1.7; color:#37614f; }
+    .data-feedback[data-error="true"] { color:#a6342e; }
+    .list-button { min-height:36px; padding:7px 12px; border:1px solid var(--line); border-radius:7px; background:white; color:#536176; font-size:12px; }
+    .list-button:hover:not(:disabled) { background:#f4f7fc; }
+    .list-button:disabled { opacity:.4; cursor:not-allowed; }
+    .accumulator-help { margin:8px 0 0; color:var(--muted); font-size:11px; line-height:1.7; }
+    .accumulator-summary { display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap; margin-top:18px; padding:16px 18px; border-radius:10px; background:var(--soft); }
+    .accumulator-counts { font-size:12px; color:#536782; }
+    .accumulator-weight { color:#214d9b; font-size:13px; overflow-wrap:anywhere; }
+    .accumulator-weight output { font-size:28px; font-weight:650; margin:0 6px; font-variant-numeric:tabular-nums; }
+    .accumulator-empty { text-align:center; margin:0; padding:24px 0 8px; font-size:12px; color:var(--muted); }
+    .accumulator-items { list-style:none; padding:0; margin:8px 0 0; }
+    .accumulator-item { display:grid; grid-template-columns:minmax(0,2.6fr) minmax(0,.6fr) repeat(4,minmax(0,.9fr)) auto; align-items:center; gap:12px; padding:17px 0; border-bottom:1px solid var(--line); }
+    .accumulator-item:last-child { border-bottom:0; padding-bottom:0; }
+    .item-details { min-width:0; overflow-wrap:anywhere; }
+    .item-details strong { font-size:13px; font-weight:600; }
+    .item-details p { font-size:11px; line-height:1.8; color:var(--muted); margin:4px 0 0; }
+    .item-metric { min-width:0; font-size:12px; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+    .item-metric span { display:block; color:var(--muted); font-size:10px; margin-bottom:5px; }
+    .item-metric strong { font-weight:550; }
+    .item-subtotal strong { color:#2154a9; }
+    .clear-confirm { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:14px; padding:10px 12px; background:#fff4f1; color:#9f3930; border-radius:8px; font-size:12px; }
+    .clear-confirm span { margin-right:auto; }
+    .clear-confirm .confirm-button { color:#a6342e; border-color:#efc9c4; }
+    .footer { margin-top:20px; color:#6f7c8f; font-size:11px; line-height:1.8; }
+    .footer p { margin:0; }
+    details { margin-top:8px; }
+    summary { cursor:pointer; width:fit-content; color:#667b9b; }
+    .sources { padding:9px 0 0 16px; margin:0; }
+    .sources a { color:#3863a3; text-underline-offset:3px; }
+    noscript { display:block; padding:20px; color:#aa3030; }
+    @media (max-width:800px) { .shell { max-width:640px; padding:24px 20px; } .workspace { grid-template-columns:1fr; } .weight-value { font-size:48px; } .topbar { margin-bottom:25px; } }
+    @media (max-width:800px) { .accumulator { padding:20px; } .accumulator-item { grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px 10px; } .item-details { grid-column:1 / -1; } .accumulator-item .list-button { grid-column:1 / -1; justify-self:end; min-height:40px; } .accumulator-weight output { font-size:25px; } }
+    @media (max-width:420px) { .shell { padding:20px 14px; } .inputs,.weight-panel { padding:20px; } h1 { font-size:28px; } .offline { font-size:10px; } .field-grid { gap:12px; } .material-grid { grid-template-columns:1fr; } input,select { font-size:16px; } .unit-select { font-size:12px; } .shape-button { font-size:11px; } .weight-value { font-size:43px; } .drawing-header { padding-left:16px; padding-right:16px; } }
+    @media (max-width:420px) { .allowance-row { grid-template-columns:1fr; gap:5px; } }
+  </style>
+</head>
+<body>
+  <noscript>请在浏览器中启用 JavaScript，以使用工件重量计算功能。</noscript>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="m12 2 9 5v10l-9 5-9-5V7zM3 7l9 5 9-5M12 12v10"/></svg></span>车间小工具</div>
+      <span class="offline">单文件 · 离线可用</span>
+    </header>
+    <div class="intro">
+      <p class="eyebrow">WORKPIECE WEIGHT CALCULATOR</p>
+      <h1>工件重量计算器</h1>
+      <p>选择形状、输入尺寸，实时计算单件重量与整批重量。</p>
+    </div>
+    <div class="workspace">
+      <form class="panel inputs" id="calculator" novalidate>
+        <section class="section" aria-labelledby="shape-heading">
+          <div class="section-title"><h2 id="shape-heading"><span class="step">01</span>选择工件形状</h2></div>
+          <div class="shape-grid" id="shape-options">
+            <button type="button" class="shape-button" data-shape="block" aria-pressed="true"><svg viewBox="0 0 40 32" aria-hidden="true"><path d="m5 12 21-7 9 6-21 7zM5 12v12l9 5 21-7V11M14 18v11"/></svg>方料 / 板材</button>
+            <button type="button" class="shape-button" data-shape="cylinder" aria-pressed="false"><svg viewBox="0 0 40 32" aria-hidden="true"><ellipse cx="11" cy="21" rx="7" ry="9"/><path d="m7 13 21-9c4-2 9 3 9 9 0 3-1 5-3 6L15 29"/></svg>圆棒 / 圆柱</button>
+            <button type="button" class="shape-button" data-shape="tube" aria-pressed="false"><svg viewBox="0 0 40 32" aria-hidden="true"><ellipse cx="11" cy="21" rx="7" ry="9"/><ellipse cx="11" cy="21" rx="3" ry="5"/><path d="m7 13 21-9c4-2 9 3 9 9 0 3-1 5-3 6L15 29"/></svg>圆管 / 圆环</button>
+            <button type="button" class="shape-button" data-shape="hex" aria-pressed="false"><svg viewBox="0 0 40 32" aria-hidden="true"><path d="m3 17 5-6 8 2 3 9-5 7-8-3zM8 11l20-7 8 2 3 9-5 7-20 7M16 13l20-7M19 22l20-7"/></svg>六角棒</button>
+            <button type="button" class="shape-button" data-shape="frustum" aria-pressed="false"><svg viewBox="0 0 40 32" aria-hidden="true"><ellipse cx="20" cy="6" rx="7" ry="3"/><path d="m13 6-9 18c0 7 32 7 32 0L27 6M4 24c0-6 32-6 32 0"/></svg>圆台 / 圆锥</button>
+            <button type="button" class="shape-button" data-shape="sphere" aria-pressed="false"><svg viewBox="0 0 40 32" aria-hidden="true"><circle cx="20" cy="16" r="13"/><ellipse cx="20" cy="16" rx="6" ry="13"/><ellipse cx="20" cy="16" rx="13" ry="5"/></svg>球体</button>
+          </div>
+        </section>
+        <section class="section" aria-labelledby="material-heading">
+          <div class="section-title"><h2 id="material-heading"><span class="step">02</span>材料与密度</h2></div>
+          <div class="field-grid material-grid">
+            <div class="field"><label for="material">材料</label><select id="material"><option value="steel">碳钢 / 普通钢</option><option value="stainless">304 不锈钢</option><option value="aluminum">6061 铝合金</option><option value="copper">纯铜</option><option value="custom">自定义密度</option></select></div>
+            <div class="field"><label for="density">密度 ρ</label><div class="input-wrap"><input class="density-input" id="density" type="number" inputmode="decimal" step="any" min="0" value="7.85" readonly required aria-describedby="density-help error"><span class="suffix">g/cm³</span></div></div>
+          </div>
+          <p class="help" id="density-help">预设为常温参考值；有材料实测密度时，请选择「自定义密度」。</p>
+        </section>
+        <section class="section" aria-labelledby="dimensions-heading">
+          <div class="section-title"><h2 id="dimensions-heading"><span class="step">03</span>尺寸与数量</h2><select class="unit-select" id="unit" aria-label="尺寸单位"><option value="mm">毫米 mm</option><option value="cm">厘米 cm</option><option value="m">米 m</option><option value="in">英寸 in</option></select></div>
+          <p class="allowance-help" id="allowance-help">余量是尺寸总量，不是单边余量；外形尺寸加余量，圆管内径减余量。不留余量填 0。例：直径 30、总余量 2，按直径 32 计重。</p>
+          <div class="field-grid" id="dimension-fields"></div>
+          <p class="help" id="shape-help"></p>
+          <p class="error" id="error" role="alert" hidden></p>
+        </section>
+        <section class="section" aria-labelledby="price-heading">
+          <div class="section-title"><h2 id="price-heading"><span class="step">04</span>材料单价</h2></div>
+          <div class="field"><label for="unit-price">每千克单价</label><div class="input-wrap"><input id="unit-price" type="number" inputmode="decimal" min="0" step="any" value="0" required aria-describedby="price-help error"><span class="suffix">元/kg</span></div></div>
+          <p class="help" id="price-help">金额 = 含余量重量 × 单价；填 0 时金额为 0。金额显示两位小数，累计按未舍入金额汇总。</p>
+        </section>
+      </form>
+      <div class="result-column">
+        <section class="weight-panel" aria-labelledby="weight-heading">
+          <div class="result-top"><h2 id="weight-heading">单件理论重量</h2><span class="live-badge" id="calculation-status">实时计算</span></div>
+          <div aria-live="polite" aria-atomic="true">
+            <div class="weight-main"><output class="weight-value" id="single-weight">—</output><span class="weight-unit">kg</span></div>
+            <div class="weight-secondary" id="single-grams">—</div>
+            <p class="allowance-weight-note" id="allowance-weight-note" hidden></p>
+            <div class="total-row"><span class="total-label"><span id="batch-weight-label">整批重量</span> · <span id="quantity-display">1</span> 件</span><div class="total-value"><output id="total-weight">—</output><small>kg</small></div></div>
+            <div class="price-row"><div><span>单件金额</span><strong id="single-cost">—</strong></div><div><span>整批金额</span><strong id="total-cost">—</strong></div></div>
+          </div>
+          <div class="result-actions">
+            <button class="copy-button add-button" type="button" id="add-result" disabled>＋ 加入累计</button>
+            <button class="copy-button" type="button" id="copy-result" disabled><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="7" y="7" width="10" height="11" rx="2"/><path d="M12 4V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h1"/></svg>复制计算结果</button>
+          </div>
+          <p class="copy-feedback" id="add-feedback" role="status" hidden></p>
+          <p class="copy-feedback" id="copy-feedback" role="status" hidden></p>
+          <textarea class="copy-fallback" id="copy-fallback" aria-label="计算结果文本，可手动复制" readonly hidden></textarea>
+        </section>
+        <section class="panel" aria-labelledby="drawing-heading">
+          <div class="drawing-header"><h2 id="drawing-heading">原始尺寸示意 · 方料 / 板材</h2><span>示意图，非等比例</span></div>
+          <div class="drawing-canvas" id="drawing"></div>
+          <div class="volume-row"><span>单件计重体积</span><strong id="volume">— cm³</strong></div>
+        </section>
+        <section class="panel formula-panel" aria-labelledby="formula-heading">
+          <h2 id="formula-heading">计算公式</h2>
+          <div class="formula" id="volume-formula"></div>
+          <div class="formula">重量 (kg) = V (mm³) × ρ (g/cm³) ÷ 10⁶</div>
+          <p class="formula-note">公式使用含余量的计重尺寸，统一换算为 mm；整批重量按未舍入的单件重量 × 数量计算。</p>
+        </section>
+      </div>
+    </div>
+    <section class="panel accumulator" aria-labelledby="accumulator-heading">
+      <div class="accumulator-header"><h2 id="accumulator-heading">累计清单</h2><div class="data-actions"><button class="list-button" id="import-json" type="button">导入 JSON</button><button class="list-button" id="export-json" type="button" disabled>导出计算 JSON</button><button class="list-button" id="export-csv" type="button" disabled>导出明细 CSV</button><button class="list-button" id="clear-entries" type="button" disabled>清空清单</button></div></div>
+      <input type="file" id="import-file" accept=".json,application/json" hidden>
+      <p class="accumulator-help">每次加入保存尺寸、余量和单价，按含余量重量与金额累计。刷新前可导出 JSON，下次导入恢复；CSV 用于查看明细，不能导入。导出 JSON 前请完成当前输入。</p>
+      <p class="data-feedback" id="data-feedback" role="status" hidden></p>
+      <div class="clear-confirm" id="import-confirm" hidden><span id="import-summary"></span><button class="list-button" id="cancel-import" type="button">取消导入</button><button class="list-button confirm-button" id="confirm-import" type="button">确认导入并替换</button></div>
+      <div class="clear-confirm" id="clear-confirm" hidden><span>确认清空全部累计条目？</span><button class="list-button" id="cancel-clear" type="button">取消</button><button class="list-button confirm-button" id="confirm-clear" type="button">确认清空</button></div>
+      <div class="accumulator-summary" aria-live="polite" aria-atomic="true">
+        <span class="accumulator-counts">共 <span id="entry-count">0</span> 项 · <span id="accumulated-quantity">0</span> 件</span>
+        <div class="accumulator-weight">累计重量 <output id="accumulated-weight">0</output> kg</div>
+        <div class="accumulator-weight">累计金额 <output id="accumulated-cost">0.00</output> 元</div>
+      </div>
+      <p class="accumulator-empty" id="accumulator-empty">暂无累计工件，先计算一项，再点击「加入累计」。</p>
+      <ol class="accumulator-items" id="accumulator-items" aria-label="已累计的工件"></ol>
+    </section>
+    <footer class="footer">
+      <p>按规则几何体计算理论重量，不含未输入的孔槽、倒角、螺纹及加工损耗；实际重量以称重为准。</p>
+      <details><summary>查看预设密度参考</summary><ul class="sources">
+        <li>碳钢 7.85 g/cm³：<a href="https://www.steelconstruction.info/images/d/da/SCI_P80.pdf" target="_blank" rel="noopener noreferrer">Steel Construction Institute · P080</a></li>
+        <li>304 不锈钢 7.90 g/cm³：<a href="https://otke-cdn.outokumpu.com/-/media/files/products/core/outokumpu-core-range-datasheet.pdf?modified=20251117111909&amp;revision=025e9931-a1d5-4c8f-8ff5-f881d38916da" target="_blank" rel="noopener noreferrer">Outokumpu · Core 304/4301</a></li>
+        <li>6061 铝合金 2.70 g/cm³：<a href="https://www.aluminum.org/sites/default/files/2026-01/Teal%20Sheets%20December%202025.pdf" target="_blank" rel="noopener noreferrer">The Aluminum Association · Teal Sheets</a></li>
+        <li>纯铜 8.96 g/cm³：<a href="https://periodic-table.rsc.org/element/29/copper" target="_blank" rel="noopener noreferrer">Royal Society of Chemistry · Copper</a></li>
+      </ul></details>
+    </footer>
+  </main>
+  <script id="weight-math">
+    "use strict";
+    const UNIT_MM = { mm:1, cm:10, m:1000, in:25.4 };
+    const MATERIALS = { steel:7.85, stainless:7.90, aluminum:2.70, copper:8.96 };
+    const MATERIAL_LABELS = { steel:"碳钢 / 普通钢", stainless:"304 不锈钢", aluminum:"6061 铝合金", copper:"纯铜", custom:"自定义密度" };
+    const SHAPES = {
+      block: { name:"方料 / 板材", fields:[["L","长度",100],["W","宽度",50],["H","厚度 / 高度",20]], formula:"V = L × W × H", help:"输入工件的实际长、宽、厚度。", volume:({L,W,H})=>L*W*H },
+      cylinder: { name:"圆棒 / 圆柱", fields:[["D","直径",30],["L","长度",100]], formula:"V = π × D² × L ÷ 4", help:"D 为直径，不是半径；薄圆片同样适用。", volume:({D,L})=>Math.PI*D*D*L/4 },
+      tube: { name:"圆管 / 圆环", fields:[["D","外径",40],["d","内径",30,true],["L","长度 / 厚度",100]], formula:"V = π × (D² − d²) × L ÷ 4", help:"内径必须小于外径；内径 = 外径 − 2 × 壁厚。", volume:({D,d,L})=>Math.PI*(D-d)*(D+d)*L/4 },
+      hex: { name:"六角棒", fields:[["S","对边尺寸",20],["L","长度",100]], formula:"V = √3 × S² × L ÷ 2", help:"S 是正六边形两平行边之间的距离，不是对角尺寸。", volume:({S,L})=>Math.sqrt(3)*S*S*L/2 },
+      frustum: { name:"圆台 / 圆锥", fields:[["D","下底直径",40],["d","上底直径",20,true],["H","垂直高度",50]], formula:"V = π × H × (D² + Dd + d²) ÷ 12", help:"上底直径填 0 即为圆锥；高度为垂直高度，不是斜边。", volume:({D,d,H})=>Math.PI*H*(D*D+D*d+d*d)/12 },
+      sphere: { name:"球体", fields:[["D","直径",30]], formula:"V = π × D³ ÷ 6", help:"输入球体直径，不是半径。", volume:({D})=>Math.PI*D*D*D/6 }
+    };
+    function calculateWeight(shapeKey, dimensions, unit, density, quantity, allowances={}, unitPrice=0) {
+      const shape = SHAPES[shapeKey];
+      function invalid(message, field) { const error = new Error(message); error.field = field; throw error; }
+      if (!shape || !Object.hasOwn(UNIT_MM, unit)) invalid("请选择有效的形状和尺寸单位。", "unit");
+      const mm = {};
+      for (const [key,label,,allowZero] of shape.fields) {
+        const raw = dimensions[key];
+        const value = Number(raw);
+        if (raw === undefined || raw === null || String(raw).trim() === "" || !Number.isFinite(value) || (allowZero ? value < 0 : value <= 0)) {
+          invalid(`${label}须为${allowZero ? "大于或等于 0" : "大于 0"}的有效数字。`, key);
+        }
+        mm[key] = value * UNIT_MM[unit];
+      }
+      if (shapeKey === "tube" && mm.d >= mm.D) invalid("内径必须小于外径，请检查圆管尺寸。", "d");
+      const effectiveMm = {};
+      let hasAllowance = false;
+      for (const [key,label] of shape.fields) {
+        const raw = allowances[key] ?? 0;
+        const allowance = Number(raw);
+        if (String(raw).trim() === "" || !Number.isFinite(allowance) || allowance < 0) invalid(`${label}余量须为大于或等于 0 的有效数字。`, "allow-"+key);
+        const subtract = shapeKey === "tube" && key === "d";
+        effectiveMm[key] = mm[key] + (subtract ? -1 : 1)*allowance*UNIT_MM[unit];
+        if (subtract && effectiveMm[key] < 0) invalid("内径减量不能大于原始内径。", "allow-"+key);
+        hasAllowance ||= allowance > 0;
+      }
+      const rho = Number(density);
+      if (!Number.isFinite(rho) || rho <= 0) invalid("密度须为大于 0 的有效数字。", "density");
+      const count = Number(quantity);
+      if (!Number.isSafeInteger(count) || count < 1) invalid("数量须为大于或等于 1 的整数，且不能超出安全整数范围。", "quantity");
+      const price = Number(unitPrice);
+      if (String(unitPrice).trim() === "" || !Number.isFinite(price) || price < 0) invalid("单价须为大于或等于 0 的有效数字。", "unit-price");
+      const nominalSingleKg = shape.volume(mm)*rho/1e6;
+      const volumeMm3 = shape.volume(effectiveMm);
+      const singleKg = volumeMm3 * rho / 1e6;
+      const totalKg = singleKg * count;
+      const singleCost = singleKg*price;
+      const totalCost = totalKg*price;
+      if (![volumeMm3,nominalSingleKg,singleKg,totalKg,singleKg*1000].every(n=>Number.isFinite(n) && n>0) || ![singleCost,totalCost].every(Number.isFinite)) invalid("数值过大或过小，超出可计算范围，请调整输入。", null);
+      return { volumeMm3, singleKg, totalKg, quantity:count, density:rho, nominalSingleKg, effectiveMm, hasAllowance, unitPrice:price, singleCost, totalCost };
+    }
+    function formatNumber(value, digits=6) {
+      if (value !== 0 && (Math.abs(value)<10**-digits || Math.abs(value)>=1e10)) return value.toExponential(5);
+      return value.toLocaleString("zh-CN", { maximumFractionDigits:digits });
+    }
+    function summarizeEntries(entries) {
+      const summary = entries.reduce((total,entry)=>({ quantity:total.quantity+entry.quantity, totalKg:total.totalKg+entry.totalKg, totalCost:total.totalCost+entry.totalCost }), { quantity:0, totalKg:0, totalCost:0 });
+      if (!Number.isSafeInteger(summary.quantity) || !Number.isFinite(summary.totalKg) || !Number.isFinite(summary.totalCost)) throw new Error("累计数量、重量或金额超出可计算范围，请先删除部分条目。");
+      return summary;
+    }
+    function formatMoney(value) {
+      return value >= 1e12 ? value.toExponential(5) : value.toLocaleString("zh-CN", { minimumFractionDigits:2, maximumFractionDigits:2 });
+    }
+    function makeEntry(input) {
+      if (!input || !Object.hasOwn(SHAPES,input.shape) || !Object.hasOwn(UNIT_MM,input.unit) || !Object.hasOwn(MATERIAL_LABELS,input.material)) throw new Error("计算数据的形状、单位或材料无效。");
+      if (!input.dimensions || !input.allowances) throw new Error("计算数据缺少尺寸或余量。");
+      if (input.material !== "custom" && Number(input.density) !== MATERIALS[input.material]) throw new Error("预设材料与密度不一致，请使用自定义密度。");
+      const shape = SHAPES[input.shape];
+      const result = calculateWeight(input.shape,input.dimensions,input.unit,input.density,input.quantity,input.allowances,input.unitPrice);
+      const normalized = { shape:input.shape, unit:input.unit, material:input.material, density:result.density, quantity:result.quantity, unitPrice:result.unitPrice, dimensions:{}, allowances:{} };
+      for (const [key] of shape.fields) {
+        normalized.dimensions[key] = Number(input.dimensions[key]);
+        normalized.allowances[key] = Number(input.allowances[key] ?? 0);
+      }
+      const originalSpec = shape.fields.map(([key,label])=>`${label} ${formatNumber(normalized.dimensions[key],9)} ${input.unit}`).join(" × ");
+      const allowanceSpec = shape.fields.map(([key])=>`${key} ${input.shape === "tube" && key === "d" ? "−" : "+"}${formatNumber(normalized.allowances[key],9)} ${input.unit}`).join("；");
+      const effectiveSpec = shape.fields.map(([key])=>`${key} ${formatNumber(result.effectiveMm[key]/UNIT_MM[input.unit],9)} ${input.unit}`).join(" × ");
+      const specification = `原始：${originalSpec}\n余量（尺寸总量）：${allowanceSpec}\n计重：${effectiveSpec}`;
+      return { ...result, input:normalized, name:shape.name, material:MATERIAL_LABELS[input.material], originalSpec, allowanceSpec, effectiveSpec, specification };
+    }
+    function serializeCalculation(current, entries) {
+      if (!current) throw new Error("请先修正当前输入，再导出计算 JSON。");
+      return JSON.stringify({ format:"workpiece-weight-calculator", version:1, exportedAt:new Date().toISOString(), current:current.input, entries:entries.map(entry=>entry.input) }, null, 2);
+    }
+    function parseCalculation(text) {
+      const data = JSON.parse(text);
+      if (!data || data.format !== "workpiece-weight-calculator" || data.version !== 1 || !Array.isArray(data.entries)) throw new Error("请选择本工具导出的 v1 计算 JSON 文件。");
+      function readEntry(input) {
+        if (!input || typeof input !== "object" || !Object.hasOwn(SHAPES,input.shape)) throw new Error("文件中存在无效的计算条目。");
+        const values = [input.density,input.quantity,input.unitPrice,...SHAPES[input.shape].fields.flatMap(([key])=>[input.dimensions?.[key],input.allowances?.[key]])];
+        if (!values.every(value=>typeof value === "number" && Number.isFinite(value))) throw new Error("文件中的尺寸、余量、数量、密度及单价须为有效数字。");
+        return makeEntry(input);
+      }
+      const current = readEntry(data.current);
+      const entries = data.entries.map(readEntry);
+      summarizeEntries(entries);
+      return { current, entries };
+    }
+    function calculationCsv(entries) {
+      const rows = [["序号","形状","材料","原始尺寸","余量（尺寸总量）","计重尺寸","密度(g/cm³)","数量(件)","单件重量(kg)","小计重量(kg)","单价(元/kg)","小计金额(元)"]];
+      entries.forEach((entry,index)=>rows.push([index+1,entry.name,entry.material,entry.originalSpec,entry.allowanceSpec,entry.effectiveSpec,entry.density,entry.quantity,entry.singleKg,entry.totalKg,entry.unitPrice,entry.totalCost.toFixed(2)]));
+      const total = summarizeEntries(entries);
+      rows.push(["合计","","","","","","",total.quantity,"",total.totalKg,"",total.totalCost.toFixed(2)]);
+      return "\uFEFF" + rows.map(row=>row.map(value=>'"'+String(value).replaceAll('"','""')+'"').join(",")).join("\r\n");
+    }
+  </script>
+  <script>
+    "use strict";
+    const $ = id => document.getElementById(id);
+    const drafts = Object.fromEntries(Object.entries(SHAPES).map(([key,shape])=>[key,Object.fromEntries(shape.fields.map(([id,,value])=>[id,String(value)]))]));
+    const allowanceDrafts = Object.fromEntries(Object.entries(SHAPES).map(([key,shape])=>[key,Object.fromEntries(shape.fields.map(([id])=>[id,0]))]));
+    let currentShape = "block";
+    let currentUnit = "mm";
+    let quantityDraft = "1";
+    let copyText = "";
+    let copyRevision = 0;
+    let currentEntry = null;
+    const accumulatedEntries = [];
+    let pendingImport = null;
+
+    function renderAccumulation() {
+      const summary = summarizeEntries(accumulatedEntries);
+      $("entry-count").textContent = accumulatedEntries.length.toLocaleString("zh-CN");
+      $("accumulated-quantity").textContent = summary.quantity.toLocaleString("zh-CN");
+      $("accumulated-weight").textContent = formatNumber(summary.totalKg);
+      $("accumulated-cost").textContent = formatMoney(summary.totalCost);
+      $("accumulator-empty").hidden = accumulatedEntries.length > 0;
+      $("clear-entries").disabled = accumulatedEntries.length === 0;
+      $("export-csv").disabled = accumulatedEntries.length === 0;
+      $("clear-confirm").hidden = true;
+      $("accumulator-items").replaceChildren();
+      accumulatedEntries.forEach((entry,index) => {
+        const item = document.createElement("li");
+        item.className = "accumulator-item";
+        const details = document.createElement("div");
+        details.className = "item-details";
+        const title = document.createElement("strong");
+        title.textContent = `${index+1}. ${entry.name}`;
+        const description = document.createElement("p");
+        description.textContent = `${entry.material} · ρ ${entry.density} g/cm³\n${entry.specification}`;
+        description.style.whiteSpace = "pre-line";
+        details.append(title,description);
+        item.append(details);
+        for (const [label,value,className] of [["数量",`${entry.quantity.toLocaleString("zh-CN")} 件`,""],[entry.hasAllowance ? "单件 / 含余量" : "单件重量",`${formatNumber(entry.singleKg)} kg`,""],["小计重量",`${formatNumber(entry.totalKg)} kg`,"item-subtotal"],["单价",`${formatNumber(entry.unitPrice)} 元/kg`,""],["小计金额",`¥ ${formatMoney(entry.totalCost)}`,"item-subtotal"]]) {
+          const metric = document.createElement("div");
+          metric.className = "item-metric " + className;
+          const caption = document.createElement("span");
+          caption.textContent = label;
+          const number = document.createElement("strong");
+          number.textContent = value;
+          metric.append(caption,number);
+          item.append(metric);
+        }
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "list-button";
+        remove.textContent = "删除";
+        remove.setAttribute("aria-label", `删除第 ${index+1} 项 ${entry.name}`);
+        remove.addEventListener("click", () => {
+          accumulatedEntries.splice(index,1);
+          renderAccumulation();
+          $("add-feedback").hidden = true;
+          const next = $("accumulator-items").querySelectorAll("button");
+          (next[Math.min(index,next.length-1)] || $("add-result")).focus();
+        });
+        item.append(remove);
+        $("accumulator-items").append(item);
+      });
+    }
+
+    function renderFields() {
+      const shape = SHAPES[currentShape];
+      $("dimension-fields").replaceChildren();
+      for (const [key,label] of shape.fields) {
+        const field = document.createElement("div");
+        field.className = "field";
+        field.innerHTML = `<label for="dim-${key}">${label}<b>${key}</b></label><div class="input-wrap"><input id="dim-${key}" type="number" inputmode="decimal" step="any" min="0" required aria-describedby="shape-help error"><span class="suffix">${currentUnit}</span></div>`;
+        const allowanceLabel = currentShape === "tube" && key === "d" ? "内径减量" : "总余量";
+        const allowanceName = currentShape === "tube" && key === "d" ? "内径减量" : label+allowanceLabel;
+        field.innerHTML += `<div class="allowance-row"><label for="allow-${key}">${allowanceLabel}</label><div class="input-wrap"><input id="allow-${key}" aria-label="${allowanceName} ${key}" type="number" inputmode="decimal" min="0" step="any" required aria-describedby="allowance-help error"><span class="suffix">${currentUnit}</span></div></div><span class="effective-size" id="effective-${key}"></span>`;
+        $("dimension-fields").append(field);
+        const raw = drafts[currentShape][key];
+        $("dim-"+key).value = raw === "" ? "" : String(Number((Number(raw)/UNIT_MM[currentUnit]).toPrecision(15)));
+        const allowance = allowanceDrafts[currentShape][key];
+        $("allow-"+key).value = allowance === "" ? "" : String(Number((Number(allowance)/UNIT_MM[currentUnit]).toPrecision(15)));
+      }
+      const quantityField = document.createElement("div");
+      quantityField.className = "field";
+      quantityField.innerHTML = '<label for="quantity">数量</label><div class="input-wrap"><input id="quantity" type="number" inputmode="numeric" min="1" step="1" required aria-describedby="error"><span class="suffix">件</span></div>';
+      $("dimension-fields").append(quantityField);
+      $("quantity").value = quantityDraft;
+      $("shape-help").textContent = shape.help + " 切换单位会自动换算尺寸。";
+      $("volume-formula").textContent = shape.formula;
+      $("drawing-heading").textContent = "原始尺寸示意 · " + shape.name;
+      for (const button of document.querySelectorAll("[data-shape]")) button.setAttribute("aria-pressed", String(button.dataset.shape===currentShape));
+      drawShape();
+      updateResult();
+    }
+
+    function drawShape() {
+      const solids = {
+        block:`<path class="body-face" fill="#eef4ff" d="m106 83 148-39 68 43-148 40z"/><path class="body-face" fill="#dbe7fb" d="M106 83v58l68 42v-56z"/><path class="body-face" fill="#c9dcf6" d="m174 127 148-40v58l-148 38z"/>`,
+        cylinder:`<path class="body-face" fill="#dae7fb" d="m132 77 127-35c35-10 70 79 35 89l-127 35z"/><ellipse class="body-face" fill="#edf4ff" cx="150" cy="122" rx="34" ry="47" transform="rotate(-18 150 122)"/>`,
+        tube:`<path class="body-face" fill="#dae7fb" d="m132 77 127-35c35-10 70 79 35 89l-127 35z"/><ellipse class="body-face" fill="#edf4ff" cx="150" cy="122" rx="34" ry="47" transform="rotate(-18 150 122)"/><ellipse class="body-face" fill="#91b0df" cx="150" cy="122" rx="19" ry="29" transform="rotate(-18 150 122)"/>`,
+        hex:`<path class="body-face" fill="#eef4ff" d="m110 99 31-25 142-35 23 28-142 36z"/><path class="body-face" fill="#c9dcf6" d="m164 103 142-36 17 44-142 37z"/><path class="body-face" fill="#afc9ee" d="m181 148 142-37-25 29-142 35z"/><path class="body-face" fill="#e2ecfc" d="m110 99 31-25 23 29 17 45-25 27-35-28z"/>`,
+        frustum:`<path class="body-face" fill="#dbe7fb" d="M170 58 125 150c0 39 180 39 180 0L260 58z"/><ellipse class="body-face" fill="#eff5ff" cx="215" cy="58" rx="45" ry="15"/><path class="dimension" stroke-dasharray="4 4" d="M125 150c0-39 180-39 180 0M215 33v149"/>`,
+        cone:`<path class="body-face" fill="#dbe7fb" d="m215 39-90 111c0 39 180 39 180 0z"/><path class="dimension" stroke-dasharray="4 4" d="M125 150c0-39 180-39 180 0M215 39v144"/>`,
+        sphere:`<circle class="body-face" fill="#e0ebfb" cx="215" cy="108" r="67"/><ellipse class="dimension" cx="215" cy="108" rx="27" ry="67"/><ellipse class="dimension" cx="215" cy="108" rx="67" ry="22" stroke-dasharray="4 4"/>`
+      };
+      const dim = (x1,y1,x2,y2,label,tx,ty) => `<path class="dimension" marker-start="url(#arrow)" marker-end="url(#arrow)" d="M${x1} ${y1}L${x2} ${y2}"/><text class="dim-label" text-anchor="middle" x="${tx}" y="${ty}">${label}</text>`;
+      const extension = d => `<path class="extension" d="${d}"/>`;
+      const labels = {
+        block:dim(179,200,327,161,"L",258,193)+dim(95,163,155,200,"W",109,195)+dim(82,88,82,140,"H",69,119)+extension("M174 183v22M322 145l8 20M106 141l-15 27M106 83H77M106 141H77"),
+        cylinder:dim(175,185,304,150,"L",250,181)+dim(102,79,102,165,"D",90,127),
+        tube:dim(175,185,304,150,"L",250,181)+dim(102,79,102,165,"D",90,127)+dim(139,99,157,146,"d",163,124),
+        hex:dim(159,195,304,158,"L",245,192)+dim(118,136,164,112,"S",143,119),
+        frustum:dim(125,194,305,194,"D",215,208)+dim(171,29,259,29,"d",215,22)+dim(334,58,334,150,"H",349,109)+extension("M260 58h81M305 150h36M125 150v48M305 150v48"),
+        sphere:dim(148,108,282,108,"D",215,99)
+      };
+      const isCone = currentShape === "frustum" && $("dim-d").value !== "" && Number($("dim-d").value) === 0;
+      const shapeDrawing = solids[isCone ? "cone" : currentShape];
+      const labelDrawing = isCone ? dim(125,194,305,194,"D",215,208)+dim(334,39,334,150,"H",349,103)+extension("M215 39h126M305 150h36") : labels[currentShape];
+      $("drawing").innerHTML = `<svg viewBox="55 0 315 220" role="img" aria-label="${SHAPES[currentShape].name}尺寸示意，尺寸符号与输入框对应"><defs><marker id="arrow" viewBox="0 0 6 6" refX="3" refY="3" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="m6 3-6-2v4z" fill="#7292c4"/></marker></defs>${shapeDrawing}${labelDrawing}</svg>`;
+    }
+
+    function updateResult() {
+      copyRevision += 1;
+      $("add-feedback").hidden = true;
+      $("copy-feedback").hidden = true;
+      $("copy-fallback").hidden = true;
+      for (const input of document.querySelectorAll("input[aria-invalid]")) input.removeAttribute("aria-invalid");
+      const shape = SHAPES[currentShape];
+      const dimensions = Object.fromEntries(shape.fields.map(([key])=>[key,$("dim-"+key).value]));
+      const allowances = Object.fromEntries(shape.fields.map(([key])=>[key,$("allow-"+key).value]));
+      try {
+        const result = makeEntry({ shape:currentShape, dimensions, allowances, unit:currentUnit, material:$("material").value, density:$("density").value, quantity:$("quantity").value, unitPrice:$("unit-price").value });
+        $("single-weight").textContent = formatNumber(result.singleKg);
+        $("single-grams").textContent = "= " + formatNumber(result.singleKg*1000,4) + " g / 件";
+        $("total-weight").textContent = formatNumber(result.totalKg);
+        $("quantity-display").textContent = formatNumber(result.quantity,0);
+        $("volume").textContent = formatNumber(result.volumeMm3/1000) + " cm³";
+        $("weight-heading").textContent = result.hasAllowance ? "单件理论重量（含余量）" : "单件理论重量";
+        $("batch-weight-label").textContent = result.hasAllowance ? "整批重量（含余量）" : "整批重量";
+        $("allowance-weight-note").hidden = !result.hasAllowance;
+        $("allowance-weight-note").textContent = `原始净重 ${formatNumber(result.nominalSingleKg)} kg / 件 · 余量增重 ${formatNumber(result.singleKg-result.nominalSingleKg)} kg / 件`;
+        $("single-cost").textContent = "¥ " + formatMoney(result.singleCost);
+        $("total-cost").textContent = "¥ " + formatMoney(result.totalCost);
+        for (const [key] of shape.fields) $("effective-"+key).textContent = "计重尺寸：" + formatNumber(result.effectiveMm[key]/UNIT_MM[currentUnit],9) + " " + currentUnit;
+        $("error").hidden = true;
+        $("error").textContent = "";
+        $("calculation-status").textContent = "实时计算";
+        $("copy-result").disabled = false;
+        currentEntry = result;
+        $("add-result").disabled = false;
+        $("export-json").disabled = false;
+        copyText = `工件理论重量与金额\n形状：${shape.name}\n材料：${result.material}，密度 ${result.density} g/cm³\n${result.specification}\n原始净重：${formatNumber(result.nominalSingleKg)} kg / 件\n含余量单件重量：${formatNumber(result.singleKg)} kg（${formatNumber(result.singleKg*1000,4)} g）\n数量：${result.quantity} 件\n整批重量：${formatNumber(result.totalKg)} kg\n单价：${formatNumber(result.unitPrice)} 元/kg\n单件金额：${formatMoney(result.singleCost)} 元\n整批金额：${formatMoney(result.totalCost)} 元`;
+      } catch (error) {
+        $("single-weight").textContent = "—";
+        $("single-grams").textContent = "请完成或修正左侧输入";
+        $("total-weight").textContent = "—";
+        $("quantity-display").textContent = "—";
+        $("volume").textContent = "— cm³";
+        $("single-cost").textContent = "—";
+        $("total-cost").textContent = "—";
+        $("allowance-weight-note").hidden = true;
+        for (const [key] of shape.fields) $("effective-"+key).textContent = "计重尺寸：—";
+        $("error").textContent = error.message;
+        $("error").hidden = false;
+        $("calculation-status").textContent = "等待有效输入";
+        $("copy-result").disabled = true;
+        $("add-result").disabled = true;
+        $("export-json").disabled = true;
+        currentEntry = null;
+        copyText = "";
+        const input = $("dim-"+error.field) || $(error.field);
+        if (input) input.setAttribute("aria-invalid", "true");
+      }
+      if (currentShape === "frustum") drawShape();
+    }
+
+    $("shape-options").addEventListener("click", event => {
+      const button = event.target.closest("[data-shape]");
+      if (!button || button.dataset.shape === currentShape) return;
+      currentShape = button.dataset.shape;
+      renderFields();
+    });
+    $("material").addEventListener("change", () => {
+      const material = $("material").value;
+      $("density").readOnly = material !== "custom";
+      if (material !== "custom") $("density").value = MATERIALS[material].toFixed(2);
+      updateResult();
+      if (material === "custom") $("density").focus();
+    });
+    $("unit").addEventListener("change", () => {
+      currentUnit = $("unit").value;
+      renderFields();
+    });
+    $("calculator").addEventListener("input", event => {
+      const input = event.target;
+      if (input.tagName !== "INPUT") return;
+      if (input.id.startsWith("dim-")) {
+        drafts[currentShape][input.id.slice(4)] = input.value === "" ? "" : Number(input.value)*UNIT_MM[currentUnit];
+      }
+      if (input.id.startsWith("allow-")) {
+        allowanceDrafts[currentShape][input.id.slice(6)] = input.value === "" ? "" : Number(input.value)*UNIT_MM[currentUnit];
+      }
+      if (input.id === "quantity") quantityDraft = input.value;
+      updateResult();
+    });
+    $("calculator").addEventListener("submit", event => event.preventDefault());
+    $("add-result").addEventListener("click", () => {
+      if (!currentEntry) return;
+      try {
+        summarizeEntries([...accumulatedEntries,currentEntry]);
+        accumulatedEntries.push({ ...currentEntry });
+        renderAccumulation();
+        $("add-feedback").textContent = `已加入累计，共 ${accumulatedEntries.length} 项。`;
+      } catch (error) {
+        $("add-feedback").textContent = error.message;
+      }
+      $("add-feedback").hidden = false;
+    });
+    $("clear-entries").addEventListener("click", () => {
+      if (!accumulatedEntries.length) return;
+      $("clear-confirm").hidden = false;
+      $("cancel-clear").focus();
+    });
+    $("cancel-clear").addEventListener("click", () => {
+      $("clear-confirm").hidden = true;
+      $("clear-entries").focus();
+    });
+    $("confirm-clear").addEventListener("click", () => {
+      accumulatedEntries.length = 0;
+      renderAccumulation();
+      $("add-feedback").hidden = true;
+      $("add-result").focus();
+    });
+    function showDataMessage(message, isError=false) {
+      $("data-feedback").textContent = message;
+      $("data-feedback").dataset.error = String(isError);
+      $("data-feedback").hidden = false;
+    }
+    function downloadFile(text, mime, filename) {
+      const url = URL.createObjectURL(new Blob([text], { type:mime }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+    }
+    $("export-json").addEventListener("click", () => {
+      try {
+        const data = serializeCalculation(currentEntry,accumulatedEntries);
+        downloadFile(data,"application/json;charset=utf-8","工件计算-"+new Date().toISOString().replace(/[:.]/g,"-")+".json");
+        showDataMessage("已生成计算 JSON，包含当前输入与累计清单，可再次导入恢复。");
+      } catch (error) { showDataMessage(error.message,true); }
+    });
+    $("export-csv").addEventListener("click", () => {
+      if (!accumulatedEntries.length) return;
+      downloadFile(calculationCsv(accumulatedEntries),"text/csv;charset=utf-8","工件明细-"+new Date().toISOString().replace(/[:.]/g,"-")+".csv");
+      showDataMessage("已生成 CSV 明细，可用 Excel 打开；如需恢复计算，请另存 JSON。");
+    });
+    $("import-json").addEventListener("click", () => $("import-file").click());
+    $("import-file").addEventListener("change", async () => {
+      const file = $("import-file").files[0];
+      if (!file) return;
+      pendingImport = null;
+      $("import-confirm").hidden = true;
+      try {
+        pendingImport = parseCalculation(await file.text());
+        $("import-summary").textContent = `已读取 ${pendingImport.entries.length} 项累计。导入将替换当前输入和清单，是否继续？`;
+        $("import-confirm").hidden = false;
+        $("data-feedback").hidden = true;
+        $("cancel-import").focus();
+      } catch (error) { showDataMessage("导入失败，原有计算未改变。" + error.message,true); }
+      $("import-file").value = "";
+    });
+    $("cancel-import").addEventListener("click", () => {
+      pendingImport = null;
+      $("import-confirm").hidden = true;
+      $("import-json").focus();
+    });
+    $("confirm-import").addEventListener("click", () => {
+      if (!pendingImport) return;
+      const imported = pendingImport;
+      pendingImport = null;
+      $("import-confirm").hidden = true;
+      const input = imported.current.input;
+      currentShape = input.shape;
+      currentUnit = input.unit;
+      quantityDraft = String(input.quantity);
+      for (const [shapeKey,shape] of Object.entries(SHAPES)) for (const [key,,value] of shape.fields) {
+        drafts[shapeKey][key] = value;
+        allowanceDrafts[shapeKey][key] = 0;
+      }
+      for (const [key] of SHAPES[currentShape].fields) {
+        drafts[currentShape][key] = input.dimensions[key]*UNIT_MM[currentUnit];
+        allowanceDrafts[currentShape][key] = input.allowances[key]*UNIT_MM[currentUnit];
+      }
+      $("unit").value = input.unit;
+      $("material").value = input.material;
+      $("density").value = input.density;
+      $("density").readOnly = input.material !== "custom";
+      $("unit-price").value = input.unitPrice;
+      accumulatedEntries.length = 0;
+      for (const entry of imported.entries) accumulatedEntries.push(entry);
+      renderFields();
+      renderAccumulation();
+      showDataMessage(`已恢复当前计算与 ${accumulatedEntries.length} 项累计，重量和金额已重新核算。`);
+      $("import-json").focus();
+    });
+    $("copy-result").addEventListener("click", async () => {
+      if (!copyText) return;
+      const revision = copyRevision;
+      const text = copyText;
+      try {
+        if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
+        await navigator.clipboard.writeText(text);
+        if (revision !== copyRevision) return;
+        $("copy-feedback").textContent = "已复制计算结果。";
+      } catch {
+        if (revision !== copyRevision) return;
+        $("copy-feedback").textContent = "浏览器未允许自动复制，请选中下方文本手动复制。";
+        $("copy-fallback").value = text;
+        $("copy-fallback").hidden = false;
+        $("copy-fallback").focus();
+        $("copy-fallback").select();
+      }
+      $("copy-feedback").hidden = false;
+    });
+    renderFields();
+  </script>
+</body>
+</html>
