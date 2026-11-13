@@ -14,6 +14,7 @@
 
 | 工具 | 路径 | 说明 |
 | --- | --- | --- |
+| 产品及模具报价单生成器 | `/tools/quotation-generator.html` | 编辑产品与费用、精确计算税额，保存草稿并打印 A4 / PDF |
 | 工件重量计算器 | `/tools/workpiece-weight-calculator.html` | 零件原材料重量、加工余量、批量金额及累计导出 |
 | IATF 16949 核心工具指南 | `/tools/iatf16949/项目目录/index.html` | 质量管理图文资料与 Mermaid 源文件 |
 | 口播提词器 | `/tools/teleprompter.html` | 手机与 iPad 提词，内置20稿，批量识别导入、TXT/JSON导出、编辑、删除与撤销、二维码共享、本机保存 |
@@ -29,9 +30,10 @@
 当前页面版本：
 
 ```text
-v1.0.8
+v1.0.9
 ```
 
+- `v1.0.9`：新增产品及模具报价单生成器 v1.0.0，支持分组费用、精确计税、草稿导入导出和 A4 打印/PDF。
 - `v1.0.8`：归入工件重量计算器与 IATF 16949 核心工具指南，增加可直接打开的 `public/offline.html` 本地入口。
 - `v1.0.7`：提词器升级v1.2.0，批量粘贴识别、TXT/JSON预览导入与导出、单篇/批量删除与撤销、二维码共享，保留旧稿。
 - `v1.0.6`：提词器升级v1.1.0，左侧文稿列表、点击切换、标题正文编辑和多篇新增，保留旧版草稿。
@@ -203,3 +205,5 @@ data/
 本地入口由 `npm run build:offline` 根据同一工具目录生成；`npm run build` 会自动更新，无需另维护一份工具清单。
 
 范围与验证记录见 `docs/html-consolidation-20261113.md`。
+
+报价单生成器使用与验证：[说明](docs/quotation-generator.md)。
