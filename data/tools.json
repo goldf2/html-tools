@@ -173,7 +173,7 @@
       "id": "quotation-generator",
       "title": "产品及模具报价单生成器",
       "href": "tools/quotation-generator.html",
-      "description": "按产品编辑费用明细，计算未税金额、税额和含税总计，支持草稿导入导出及 A4 打印/PDF。",
+      "description": "编辑产品、费用及逐行备注，调节产品列宽、替换公司 Logo，自动计税并打印 A4 / PDF。",
       "category": "制造工具",
       "badge": "报价与打印",
       "order": 8,
@@ -185,7 +185,7 @@
         "PDF",
         "打印"
       ],
-      "version": "1.0.0",
+      "version": "1.1.0",
       "kind": "static-html",
       "platforms": {
         "web": true,

@@ -65,4 +65,20 @@ check('draft import preserves incomplete values for editing', () => {
   const input = fixture([fee('', '1')]); assert.equal(normalize(input).products[0].fees[0].quantity, '');
   assert.throws(() => calculate(normalize(input)), /数量/);
 });
+check('legacy drafts receive empty line notes, default logo and column width', () => {
+  const input = normalize(fixture([fee('1', '1')]));
+  assert.equal(input.products[0].fees[0].notes, '');
+  assert.equal(input.logoData, ''); assert.equal(input.productWidth, '32');
+});
+check('notes, multiline names, logo and column width survive normalization', () => {
+  const input = fixture([{ ...fee('1', '1'), notes: '按图纸要求\n分批交付' }]);
+  input.products[0].name = '产品 A\n型号 B'; input.logoData = 'data:image/png;base64,AAAA'; input.productWidth = '42';
+  const result = normalize(input);
+  assert.equal(result.products[0].fees[0].notes, '按图纸要求\n分批交付');
+  assert.equal(result.products[0].name, '产品 A\n型号 B');
+  assert.equal(result.logoData, input.logoData); assert.equal(result.productWidth, '42');
+  assert.throws(() => normalize({ ...input, productWidth: '43' }), /列宽/);
+  assert.throws(() => normalize({ ...input, logoData: 'javascript:alert(1)' }), /Logo/);
+  input.products[0].fees[0].notes = 'a'.repeat(1001); assert.throws(() => normalize(input), /长度/);
+});
 console.log(`${checks} quotation checks passed`);
