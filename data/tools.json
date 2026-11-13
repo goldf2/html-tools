@@ -185,7 +185,7 @@
         "PDF",
         "打印"
       ],
-      "version": "1.1.0",
+      "version": "1.1.1",
       "kind": "static-html",
       "platforms": {
         "web": true,

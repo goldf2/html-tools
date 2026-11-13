@@ -1,7 +1,8 @@
 (function () {
+  if (window.self !== window.top || location.protocol === 'file:') return;
   if (document.querySelector('.site-nav')) return;
 
-  var APP_VERSION = '1.0.10';
+  var APP_VERSION = '1.1.0';
 
   function absoluteHref(href) {
     return href && href.charAt(0) === '/' ? href : '/' + href;
